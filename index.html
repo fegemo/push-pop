@@ -8,7 +8,7 @@
 
 	<script src="libraries/p5.dom.js" type="text/javascript"></script>
 	<script src="libraries/p5.sound.js" type="text/javascript"></script>
-	<link href="https://fonts.googleapis.com/css?family=Amatic+SC|Pacifico" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Amatic+SC|Abel" rel="stylesheet">
 	<script src="sketch.js" type="text/javascript"></script>
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -36,7 +36,7 @@
 		<div class="row">
 			<div class="col-md-offset-2 col-md-8">
 				</br>
-				<h1>Welcome to the Push/Pop matrix tutorial!!</h1>
+				<h1>Bem vindo ao tutorial Push/Pop matrix!!</h1>
 				</br>
 			</div>
 		</div>
@@ -44,30 +44,27 @@
 			<div id="bg" class="gameBg col-md-8">
 				<div id="holder"></div>
 			</div>
-			
+
 			<div class=" col-md-offset-1 col-md-3">
 				<h2>Esse site tem o intuito de mostrar o funcionamento da pilha
 				e também como ocorrem as transformações de matrizes.</h2>
-				
+
 			</div>
 
-			<div class=" mat col-md-offset-1 col-md-3">
-				<input value="1" class="matrix" type="text" id="r1c1">
-				<input value="0" class="matrix" type="text" id="r1c2">
-				<input value="0" class="matrix" type="text" id="r1c3">
-				<br/>
-				<input value="0" class="matrix" type="text" id="r2c1">
-				<input value="1" class="matrix" type="text" id="r2c2">
-				<input value="0" class="matrix" type="text" id="r2c3">
-				<br/>
-				<input value="0" class="matrix" type="text" id="r3c1">
-				<input value="0" class="matrix" type="text" id="r3c2">
-				<input value="1" class="matrix" type="text" id="r3c3">
-				<p> É nessa matriz que são aplicadas as transformações(Modifique-a e veja o que acontece)</p>
+			<div class="mat col-md-offset-1 col-md-3">
+				<input value="1" class="matrix" type="text" id="r1c1" pattern="[\d]+">
+				<input value="0" class="matrix" type="text" id="r1c2" pattern="[\d]+">
+				<input value="0" class="matrix" type="text" id="r1c3" pattern="[\d]+">
+				<input value="0" class="matrix" type="text" id="r2c1" pattern="[\d]+">
+				<input value="1" class="matrix" type="text" id="r2c2" pattern="[\d]+">
+				<input value="0" class="matrix" type="text" id="r2c3" pattern="[\d]+">
+				<input value="0" class="matrix" type="text" id="r3c1" pattern="[\d]+">
+				<input value="0" class="matrix" type="text" id="r3c2" pattern="[\d]+">
+				<input value="1" class="matrix" type="text" id="r3c3" pattern="[\d]+">
 			</div>
 
-			<div class=" col-md-offset-1 col-md-3">
-				<h2>Change: Serve para aplicar a modificação na matriz do topo da pilha</h2>
+			<div class="col-md-offset-1 col-md-3">
+				<h2>Load: Serve para aplicar a modificação na matriz do topo da pilha</h2>
 			</div>
 
 			<div class=" col-md-offset-1 col-md-3">
@@ -75,7 +72,7 @@
 				<h2>Push : Coloca uma matriz com as ultimas alterações feitas</h2>
 				<h2>Pop : Retira a matriz no topo da pilha</h2>
 			</div>
-			
+
 			</div>
 			</div>
 		</div>
