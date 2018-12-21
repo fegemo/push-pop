@@ -10,58 +10,85 @@ body {
 	color:white;
 	font-family: 'Abel', sans-serif;
 	font-size:3em;
-
 }
 
 canvas {
-	top:50%;margin-top:-10px;
-	vertical-align: top;
-	margin-left:65px;
-	margin-top: 70px;
+	display: block;
+	margin: 40px auto;
 	border: 2px solid;
-	border-radius:10px;
+	border-radius: 10px;
 }
 
-.row {
-
+#modal-matrix {
+	color: black;
 }
 
-input {
+.matrix-value {
 	border: 1px solid;
 	border-radius: 3px;
 	text-align: center;
+	color: black;
+	text-align: center;
 }
 
-.matrix{
-	color:black;
-	text-align:center;
-
-}
-
-.gameBg{
-	color:black;
-	border: 15px solid;
-	border-radius:20px;
-	background:linear-gradient(#FECEA8,#FF847C);
-	height: 900px;
-}
-
-h1{
-	font-size:2em;
+h1 {
+	font-size: 2em;
 }
 
 .mat {
 	text-align: center;
 	display: grid;
-	grid: repeat(3, 1.5em) / auto-flow 1.5em;
+	grid: repeat(4, 1.5em) / auto-flow 1.5em;
 	grid-gap: 0.15em;
 	justify-content: center;
+	font-size: 0.75em;
 }
 
-.c{
-	background:red;
+.modal-dialog {
+	min-width: 800px;
 }
 
-footer{
-	height:200px;
+#matrices {
+	display: grid;
+	text-align: center;
+	grid: auto 1fr auto / repeat(3, 1fr);
+	grid-gap: 0.25em;
+}
+
+#matrices.single-matrix {
+	grid: auto 1fr / 1fr;
+}
+
+#matrices .invisible {
+	display: none;
+}
+
+#operation-params {
+	grid-column: 1 / span 3;
+	text-align: left;
+}
+
+.matrix-description {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-around;
+}
+
+.parameter {
+	box-sizing: border-box;
+	width: 2em;
+	border-radius: 3px;
+	border-width: 0;
+	text-align: center;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type="number"] {
+	-moz-appearance: textfield;
 }

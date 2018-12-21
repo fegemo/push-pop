@@ -1,8 +1,12 @@
-var xAxis = 600 / 2;
-var yAxis = 400 / 2;
+const dimensions = {
+	width: 600,
+	height: 600
+};
+var xAxis = dimensions.width / 2;
+var yAxis = dimensions.height / 2;
 var Matrizes = [];
 var numObj = 0;
-var id = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+var id = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 var id2 = [];
 var actual = 0;
 var tam = 1;
@@ -19,10 +23,25 @@ class Button {
 	}
 
 	draw() {
+		if (this.hover) {
+			strokeWeight(2);
+		}
 		stroke(0, 0, 0);
 		rect(this.x, this.y, this.width, this.height);
 		textSize(15);
 		text(this.text, this.x + 5, this.y + 20);
+
+		if (this.hover) {
+			strokeWeight(1);
+		}
+	}
+
+	mouseover() {
+		this.hover = true;
+	}
+
+	mouseout() {
+		this.hover = false;
 	}
 
 	isPointWithin(x, y) {
@@ -40,21 +59,17 @@ class PushMatrixButton extends Button {
 	}
 
 	execute() {
-		if (Matrizes.length == 0) {
+		if (Matrizes.length === 0) {
 			var d3 = [];
 			arrayCopy(id2, d3);
-			Matrizes.push(new Matrix(d3, height - 51));
-		} else if (Matrizes.length == 1) {
-			if (Matrizes[Matrizes.length - 1].bot) {
-				var d4 = [];
-				arrayCopy(Matrizes[Matrizes.length - 1].numbers, d4);
-				Matrizes.push(new Matrix(d4, ((Matrizes[Matrizes.length - 1]).pos.y) - 80));
-			}
+
+			// the first matrix
+			Matrizes.push(new Matrix(d3, dimensions.height - Matrix.size(4)/2));
 		} else if (Matrizes.length < 4) {
 			if (Matrizes[Matrizes.length - 1].bot) {
 				var d5 = [];
 				arrayCopy(Matrizes[Matrizes.length - 1].numbers, d5);
-				Matrizes.push(new Matrix(d5, ((Matrizes[Matrizes.length - 1]).pos.y) - 80));
+				Matrizes.push(new Matrix(d5, ((Matrizes[Matrizes.length - 1]).pos.y) - Matrix.size(4) * 0.9));
 			}
 		}
 	}
@@ -77,21 +92,64 @@ class LoadMatrixButton extends Button {
 
 	execute() {
 		if (Matrizes.length > 0) {
-			insertedMatrix(Matrizes[Matrizes.length - 1].numbers);
+			openMatrixModal(this, Matrizes[Matrizes.length - 1].numbers)
+				.then(numbers => Matrizes[Matrizes.length - 1].numbers = numbers)
+				.catch(() => {});
 		}
+	}
+
+	getParams() {
+		return {
+			showLeftMatrix: false,
+			showMiddleMatrix: true,
+			showRightMatrix: false,
+			params: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+			openGLCommands: [
+				'GLfloat mat[] = { @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input };',
+				'glLoadMatrixf(mat);'
+			]
+		};
 	}
 }
 
 class MultMatrixButton extends Button {
-	constructor(x, y, width, height) {
-		super('glMultMatrix(...)', x, y, width, height);
+	constructor(text, x, y, width, height) {
+		super(text, x, y, width, height);
 	}
 
 	execute() {
 		if (Matrizes.length) {
-			debugger;
-			insertedMatrix();
+			openMatrixModal(this, Matrizes[Matrizes.length - 1].numbers)
+				.then(numbers => Matrizes[Matrizes.length - 1].numbers = numbers)
+				.catch(() => {});
+
 		}
+	}
+
+	getParams() {
+		return {
+			showLeftMatrix: true,
+			showMiddleMatrix: true,
+			showRightMatrix: true,
+			params: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+			openGLCommands: [
+				'GLfloat mat[] = { @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input };',
+				'glMultMatrixf(mat);'
+			]
+		};
+	}
+}
+
+class TranslateButton extends MultMatrixButton {
+	constructor(x, y, width, height) {
+		super('glTranslate(...)', x, y, width, height);
+	}
+
+	getParams() {
+		return Object.assign({}, super.getParams(), {
+			params: [false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, false],
+			openGLCommands: ['glTranslatef(@input, @input, @input)']
+		});
 	}
 }
 
@@ -112,73 +170,82 @@ class DisabledButton extends Button {
 }
 
 let buttons = [
-	new PushMatrixButton(455, 320, 112, 25),
-	new PopMatrixButton(455, 350, 105, 25),
-	new DisabledButton('glTranslate(...)', 35, 220, 110, 25),
-	new DisabledButton('glScale(...)', 35, 250, 90, 25),
-	new DisabledButton('glRotate(...)', 35, 280, 90, 25),
-	new LoadMatrixButton(35, 320, 120, 25),
-	new DisabledButton('glMultMatrix(...)', 35, 350, 115, 25)
+	new PushMatrixButton(455, dimensions.height - 80, 112, 25),
+	new PopMatrixButton(455, dimensions.height - 50, 105, 25),
+	new TranslateButton(35, dimensions.height - 180, 110, 25),
+	new DisabledButton('glScale(...)', 35, dimensions.height - 150, 90, 25),
+	new DisabledButton('glRotate(...)', 35, dimensions.height -120, 90, 25),
+	new LoadMatrixButton(35, dimensions.height - 80, 120, 25),
+	new MultMatrixButton('glMultMatrix(...)', 35, dimensions.height - 50, 115, 25)
 ];
 
-function brackets(x, y) {
-	noStroke();
+class Matrix {
+	constructor(numbers, bottomLimit) {
+		this.numbers = numbers;
+		this.pos = createVector(xAxis, 0);
+		this.vel = createVector(0, 0);
+		this.acc = createVector(0, 0.5);
+		this.bot = false;
+		this.bottomLimit = bottomLimit;
+		this.size = Math.floor(Math.sqrt(numbers.length));
+	}
 
-	//LEFT BRACKETS
-	rect(x - 50, y - 50, 22, 5);
-	rect(x - 50, y - 50, 5, 85);
-	rect(x - 50, y + 30, 22, 5);
+	limits() {
+		return {
+			left: this.pos.x - this.size / 2 * Matrix.characterSpacing,
+			right: this.pos.x + this.size / 2 * Matrix.characterSpacing,
+			top: this.pos.y - this.size/2 * Matrix.characterSpacing - 10,
+			bottom: this.pos.y + this.size/2 * Matrix.characterSpacing - 10
+		};
+	}
 
-	//RIGHT BRACKETS
-	rect(x + 20, y - 50, 22, 5);
-	rect(x + 37, y - 50, 5, 81);
-	rect(x + 20, y + 30, 22, 5);
-	stroke(0);
-}
+	static get characterSpacing() {
+		return 30;
+	}
 
-function Matrix(num, bottomLimit) {
+	static size(s) {
+		return s * Matrix.characterSpacing + 20;
+	}
 
-	this.numbers = num;
+	draw() {
+		noStroke();
 
-	this.pos = createVector(xAxis, 0);
-	this.vel = createVector(0, 0);
-	this.acc = createVector(0, 0.5);
-	this.bot = false;
+		let x = this.pos.x;
+		let y = this.pos.y;
 
-	this.display = function() {
+		// left brackets
+		rect(x - this.size/2 * Matrix.characterSpacing, y - this.size/2 * Matrix.characterSpacing - 10, 22, 5);
+		rect(x - this.size/2 * Matrix.characterSpacing, y - this.size/2 * Matrix.characterSpacing - 10, 5, this.size * Matrix.characterSpacing);
+		rect(x - this.size/2 * Matrix.characterSpacing, y + this.size/2 * Matrix.characterSpacing - 10, 22, 5);
 
-		//rect(this.pos.x - 45, this.pos.y - 45, 80, 75)
-		brackets(this.pos.x, this.pos.y);
+		// right brackets
+		rect(x + this.size/2 * Matrix.characterSpacing - 22, y - this.size/2 * Matrix.characterSpacing - 10, 22, 5);
+		rect(x + this.size/2 * Matrix.characterSpacing, y - this.size/2 * Matrix.characterSpacing - 10, 5, this.size * Matrix.characterSpacing);
+		rect(x + this.size/2 * Matrix.characterSpacing - 22, y + this.size/2 * Matrix.characterSpacing - 10, 27, 5);
+		stroke(0);
 
-
-		var i = 0;
-		var x = 1;
-		var y = 1;
-		while (i < 9) {
-			text(this.numbers[i], (this.pos.x + (-30 * x) - 10), (this.pos.y + (-25 * y)));
-			if (x == -1) {
-				y--;
-				x = 2;
+		// numbers
+		for (let i = 0; i < this.size; i++) {
+			for (let j = 0; j < this.size; j++) {
+				const posX = x + (Matrix.characterSpacing * (j - (this.size-1)/2));
+				const posY = y + (Matrix.characterSpacing * (i - (this.size-1)/2));
+				text(this.numbers[i * this.size + j], posX, posY);
 			}
-			x--;
-			i++;
 		}
 	}
 
-	this.drop = function() {
-		if (this.pos.y < bottomLimit - 8) {
+	drop() {
+		if (this.pos.y < this.bottomLimit - 8) {
 			this.pos.y += this.vel.y;
 			this.vel.y += this.acc.y;
 
 			return true;
 		} else {
 			this.bot = true;
-			this.pos.y = bottomLimit - 8;
+			this.pos.y = this.bottomLimit - 8;
 			return false;
 		}
 	}
-
-
 }
 
 function ButtonPush() {
@@ -224,8 +291,9 @@ function mainScreen() {
 		mulTam *= -1;
 	}
 	push();
+	noStroke();
 	fill(100, 255, 100);
-	rect(0, 370, width, 50);
+	rect(0, height - 50, width, 50);
 	pop();
 
 	for (button of buttons) {
@@ -233,29 +301,37 @@ function mainScreen() {
 	}
 
 	if (Matrizes.length > 0) {
-		text("Using", Matrizes[Matrizes.length - 1].pos.x + 45, Matrizes[Matrizes.length - 1].pos.y);
+		text("Atual", Matrizes[Matrizes.length - 1].pos.x + Matrix.size(4) * 0.5, Matrizes[Matrizes.length - 1].pos.y);
 	}
 	for (var i = Matrizes.length - 1; i >= 0; i--) {
 		if (!Matrizes[i].bot) {
 			Matrizes[i].drop();
 		}
-		Matrizes[i].display();
+		Matrizes[i].draw();
 	}
 }
 
-function insertedMatrix(matrix) {
-	matrix[0] = document.getElementById("r1c1").value;
-	matrix[1] = document.getElementById("r1c2").value;
-	matrix[2] = document.getElementById("r1c3").value;
-
-	matrix[3] = document.getElementById("r2c1").value;
-	matrix[4] = document.getElementById("r2c2").value;
-	matrix[5] = document.getElementById("r2c3").value;
-
-	matrix[6] = document.getElementById("r3c1").value;
-	matrix[7] = document.getElementById("r3c2").value;
-	matrix[8] = document.getElementById("r3c3").value;
-}
+// function insertedMatrix(matrix) {
+// 	matrix[0] = document.getElementById("r1c1").value;
+// 	matrix[1] = document.getElementById("r1c2").value;
+// 	matrix[2] = document.getElementById("r1c3").value;
+// 	matrix[3] = document.getElementById("r1c4").value;
+//
+// 	matrix[4] = document.getElementById("r2c1").value;
+// 	matrix[5] = document.getElementById("r2c2").value;
+// 	matrix[6] = document.getElementById("r2c3").value;
+// 	matrix[7] = document.getElementById("r2c4").value;
+//
+// 	matrix[8] = document.getElementById("r3c1").value;
+// 	matrix[9] = document.getElementById("r3c2").value;
+// 	matrix[10] = document.getElementById("r3c3").value;
+// 	matrix[11] = document.getElementById("r3c4").value;
+//
+// 	matrix[12] = document.getElementById("r4c1").value;
+// 	matrix[13] = document.getElementById("r4c2").value;
+// 	matrix[14] = document.getElementById("r4c3").value;
+// 	matrix[15] = document.getElementById("r4c4").value;
+// }
 
 function mouseClicked() {
 	for (button of buttons) {
@@ -265,14 +341,23 @@ function mouseClicked() {
 	}
 }
 
+function mouseMoved() {
+	for (button of buttons) {
+		if (button.isPointWithin(mouseX, mouseY)) {
+			button.mouseover();
+		} else {
+			button.mouseout();
+		}
+	}
+}
+
 function setup() {
-	canvas = createCanvas(600, 400);
+	canvas = createCanvas(dimensions.width, dimensions.height);
 	arrayCopy(id, id2);
 	var d3 = [];
 	arrayCopy(id, d3);
-	Matrizes.push(new Matrix(id, height - 51));
+	Matrizes.push(new Matrix(id, dimensions.height - Matrix.size(4)/2));
 	canvas.parent('holder');
-
 }
 
 
