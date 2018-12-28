@@ -1,94 +1,94 @@
 h1 {
-	font-family: 'Amatic SC', cursive;
+  font-family: "Amatic SC", cursive;
 }
 
 body {
-	padding: 0;
-	margin: 0;
-	height: 1080px;
-	background: linear-gradient(#2A363B,#99B898);
-	color:white;
-	font-family: 'Abel', sans-serif;
-	font-size:3em;
+  padding: 0;
+  margin: 0;
+  height: 1080px;
+  background: linear-gradient(#2a363b, #99b898);
+  color: white;
+  font-family: "Abel", sans-serif;
+  font-size: 3em;
 }
 
 canvas {
-	display: block;
-	margin: 40px auto;
-	border: 2px solid;
-	border-radius: 10px;
+  display: block;
+  margin: 40px auto;
+  border: 2px solid;
+  border-radius: 10px;
 }
 
 #modal-matrix {
-	color: black;
+  color: black;
 }
 
 .matrix-value {
-	border: 1px solid;
-	border-radius: 3px;
-	text-align: center;
-	color: black;
-	text-align: center;
+  border: 1px solid;
+  border-radius: 3px;
+  text-align: center;
+  color: black;
+  text-align: center;
 }
 
 h1 {
-	font-size: 2em;
+  font-size: 2em;
 }
 
 .mat {
-	text-align: center;
-	display: grid;
-	grid: repeat(4, 1.5em) / auto-flow 1.5em;
-	grid-gap: 0.15em;
-	justify-content: center;
-	font-size: 0.75em;
+  text-align: center;
+  display: grid;
+  grid: repeat(4, 1.5em) / auto-flow 1.5em;
+  grid-gap: 0.15em;
+  justify-content: center;
+  font-size: 0.75em;
 }
 
 .modal-dialog {
-	min-width: 800px;
+  min-width: 800px;
 }
 
 #matrices {
-	display: grid;
-	text-align: center;
-	grid: auto 1fr auto / repeat(3, 1fr);
-	grid-gap: 0.25em;
+  display: grid;
+  text-align: center;
+  grid: auto 1fr auto / repeat(3, 1fr);
+  grid-gap: 0.25em;
 }
 
 #matrices.single-matrix {
-	grid: auto 1fr / 1fr;
+  grid: auto 1fr / 1fr;
 }
 
 #matrices .invisible {
-	display: none;
+  display: none;
 }
 
 #operation-params {
-	grid-column: 1 / span 3;
-	text-align: left;
+  grid-column: 1 / span 3;
+  text-align: left;
 }
 
 .matrix-description {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-around;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .parameter {
-	box-sizing: border-box;
-	width: 2em;
-	border-radius: 3px;
-	border-width: 0;
-	text-align: center;
+  box-sizing: border-box;
+  width: 2em;
+  border-radius: 3px;
+  border-width: 0;
+  text-align: center;
 }
 
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
-	-webkit-appearance: none;
-	margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 input[type="number"] {
-	-moz-appearance: textfield;
+  -moz-appearance: textfield;
 }
