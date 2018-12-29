@@ -1,25 +1,54 @@
+function clearModalMatrices(currentMatrix) {
+  const modalMatrixEl = document.querySelector("#modal-matrix");
+  const currentMatrixEl = modalMatrixEl.querySelector("#mat-left");
+  const generatedMatrixEl = modalMatrixEl.querySelector("#mat-top");
+  const resultingMatrixEl = modalMatrixEl.querySelector("#mat-right");
+
+  let currents = Array.from(currentMatrixEl.querySelectorAll(".matrix-value"));
+  let generated = Array.from(
+    generatedMatrixEl.querySelectorAll(".matrix-value")
+  );
+  let resulting = Array.from(
+    resultingMatrixEl.querySelectorAll(".matrix-value")
+  );
+  let parameters = Array.from(modalMatrixEl.querySelectorAll(".parameter"));
+
+  // sets the value of the current matrix
+  currents.forEach((el, i) => (el.value = currentMatrix[i]));
+
+  // loads an identity as the generated matrix (initially)
+  generated.forEach(
+    (el, i) => (el.value = i % (matrixDimension + 1) === 0 ? 1 : 0)
+  );
+
+  // unbinds previous bindings from one input to another
+  binder.unbind(...currents, ...generated, ...resulting, ...parameters);
+
+  // disables all inputs
+  modalMatrixEl
+    .querySelectorAll(".matrix-value")
+    .forEach(el => el.setAttribute("disabled", true));
+}
+
 function openMatrixModal(operation, currentMatrix) {
   const modalMatrixEl = document.querySelector("#modal-matrix");
   const currentMatrixEl = modalMatrixEl.querySelector("#mat-left");
   const generatedMatrixEl = modalMatrixEl.querySelector("#mat-top");
   const resultingMatrixEl = modalMatrixEl.querySelector("#mat-right");
-  modalMatrixEl.style.display = "block";
-  setTimeout(() => {
-    modalMatrixEl.classList.add("in");
-  }, 10);
 
+  // resets the modal to its defaults
+  clearModalMatrices(currentMatrix);
+
+  // sets up the visibility of the matrices inside the modal
   const params = operation.getParams();
   currentMatrixEl.classList.toggle("invisible", !params.showLeftMatrix);
   modalMatrixEl
     .querySelector("#current-matrix")
-    .classList.toggle("invisible", !params.showMiddleMatrix);
+    .classList.toggle("invisible", !params.showLeftMatrix);
   generatedMatrixEl.classList.toggle("invisible", !params.showMiddleMatrix);
   modalMatrixEl
     .querySelector("#generated-matrix")
-    .classList.toggle("invisible", !params.showLeftMatrix);
-  modalMatrixEl
-    .querySelector("#operation-params")
-    .classList.toggle("invisible", !params.showLeftMatrix);
+    .classList.toggle("invisible", !params.showMiddleMatrix);
   resultingMatrixEl.classList.toggle("invisible", !params.showRightMatrix);
   modalMatrixEl
     .querySelector("#resulting-matrix")
@@ -34,22 +63,39 @@ function openMatrixModal(operation, currentMatrix) {
         !params.showRightMatrix
     );
 
+  // configures the parameter and OpenGL commands section of the modal
   const paramsEl = modalMatrixEl.querySelector("#operation-params");
   paramsEl.innerHTML = `<pre><code>${params.openGLCommands
     .map(c => input(c))
     .join("\n")}</code></pre>`;
-  params.params.forEach((p, i) => {
-    if (p) {
+  for (let c = 0; c < matrixDimension * matrixDimension; c++) {
+    // enables only the matrices elements that can be changed directly by
+    // this operation
+    if (params.configurableParams & (1 << c)) {
       generatedMatrixEl
-        .querySelector(`.matrix-value:nth-of-type(${i + 1})`)
+        .querySelector(".mat")
+        .querySelector(`.matrix-value:nth-of-type(${c + 1})`)
         .removeAttribute("disabled");
     }
-  });
+  }
 
+  // configures the binding of the command parameters and the matrix
+  operation.configureBinding(
+    generatedMatrixEl.querySelector(".mat"),
+    modalMatrixEl.querySelector("#operation-params")
+  );
+
+  // effectively shows the modal
+  modalMatrixEl.style.display = "block";
+  setTimeout(() => {
+    modalMatrixEl.classList.add("in");
+  }, 10);
+
+  // utility functions used inside the modal
   function input(line) {
     return line.replace(
-      /@input/g,
-      '<input type="number" class="parameter float-parameter">'
+      /@input\:([+-]?\d+(\.\d+)?)/g,
+      '<input type="number" class="parameter float-parameter" value="$1" placeholder="0">'
     );
   }
 
@@ -57,46 +103,45 @@ function openMatrixModal(operation, currentMatrix) {
     return parseFloat(modalMatrixEl.querySelector(id).value);
   }
 
+  // a promise that is resolved when the modal is closed either by "okaying"
+  // or dismissing it (reject)
   return new Promise((resolve, reject) => {
-    const matrix = currentMatrix;
+    let matrix = currentMatrix;
 
     let modalOkEl = modalMatrixEl.querySelector("#matrix-ok");
-    modalOkEl.addEventListener("click", () => {
-      alert("Vai dar pau pq tirei os ids das matrizes");
-      matrix[0] = getValue("#r1c1");
-      matrix[1] = getValue("#r1c2");
-      matrix[2] = getValue("#r1c3");
-      matrix[3] = getValue("#r1c4");
+    let modalCloseEls = modalMatrixEl.querySelectorAll(".close");
 
-      matrix[4] = getValue("#r2c1");
-      matrix[5] = getValue("#r2c2");
-      matrix[6] = getValue("#r2c3");
-      matrix[7] = getValue("#r2c4");
+    let closeModal = e => {
+      // removes the click handler, as it is
+      e.currentTarget.removeEventListener("click", okHandler);
 
-      matrix[8] = getValue("#r3c1");
-      matrix[9] = getValue("#r3c2");
-      matrix[10] = getValue("#r3c3");
-      matrix[11] = getValue("#r3c4");
-
-      matrix[12] = getValue("#r4c1");
-      matrix[13] = getValue("#r4c2");
-      matrix[14] = getValue("#r4c3");
-      matrix[15] = getValue("#r4c4");
-      resolve(matrix);
+      // triggers the closing animation
       modalMatrixEl.classList.remove("in");
       setTimeout(() => {
         modalMatrixEl.style.display = "none";
       }, 500);
-    });
+    };
 
-    let modalClose = modalMatrixEl.querySelectorAll(".close").forEach(el => {
-      el.addEventListener("click", () => {
-        modalMatrixEl.classList.remove("in");
-        setTimeout(() => {
-          modalMatrixEl.style.display = "none";
-        }, 500);
-        reject();
-      });
-    });
+    const okHandler = e => {
+      // sets the value of the currentMatrix as the resulting one
+      matrix = Array.from(
+        modalMatrixEl.querySelectorAll("#mat-right .matrix-value")
+      ).map(el => parseFloat(el.value));
+
+      // and resolves the promise with the result
+      resolve(matrix);
+
+      closeModal(e);
+    };
+
+    const closeHandler = e => {
+      closeModal(e);
+
+      // rejects the promise to whom opened this modal
+      reject();
+    };
+
+    modalOkEl.addEventListener("click", okHandler);
+    modalCloseEls.forEach(el => el.addEventListener("click", closeHandler));
   });
 }

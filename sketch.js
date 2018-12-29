@@ -2,9 +2,10 @@ const dimensions = {
   width: 600,
   height: 600
 };
+const matrixDimension = 4;
 var xAxis = dimensions.width / 2;
 var yAxis = dimensions.height / 2;
-var Matrizes = [];
+let matrixStack = [];
 var numObj = 0;
 var id = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 var id2 = [];
@@ -56,6 +57,10 @@ class Button {
   execute() {
     alert("Ainda não implementado");
   }
+
+  configureBinding(matricesEl) {
+    alert("Ainda não implementado");
+  }
 }
 
 class PushMatrixButton extends Button {
@@ -64,20 +69,20 @@ class PushMatrixButton extends Button {
   }
 
   execute() {
-    if (Matrizes.length === 0) {
+    if (matrixStack.length === 0) {
       var d3 = [];
       arrayCopy(id2, d3);
 
       // the first matrix
-      Matrizes.push(new Matrix(d3, dimensions.height - Matrix.size(4) / 2));
-    } else if (Matrizes.length < 4) {
-      if (Matrizes[Matrizes.length - 1].bot) {
+      matrixStack.push(new Matrix(d3, dimensions.height - Matrix.size(4) / 2));
+    } else if (matrixStack.length < 4) {
+      if (matrixStack[matrixStack.length - 1].bot) {
         var d5 = [];
-        arrayCopy(Matrizes[Matrizes.length - 1].numbers, d5);
-        Matrizes.push(
+        arrayCopy(matrixStack[matrixStack.length - 1].numbers, d5);
+        matrixStack.push(
           new Matrix(
             d5,
-            Matrizes[Matrizes.length - 1].pos.y - Matrix.size(4) * 0.9
+            matrixStack[matrixStack.length - 1].pos.y - Matrix.size(4) * 0.9
           )
         );
       }
@@ -91,7 +96,7 @@ class PopMatrixButton extends Button {
   }
 
   execute() {
-    Matrizes.splice(Matrizes.length - 1, 1);
+    matrixStack.splice(matrixStack.length - 1, 1);
   }
 }
 
@@ -101,11 +106,39 @@ class LoadMatrixButton extends Button {
   }
 
   execute() {
-    if (Matrizes.length > 0) {
-      openMatrixModal(this, Matrizes[Matrizes.length - 1].numbers)
-        .then(numbers => (Matrizes[Matrizes.length - 1].numbers = numbers))
+    if (matrixStack.length > 0) {
+      openMatrixModal(this, matrixStack[matrixStack.length - 1].numbers)
+        .then(numbers => (matrixStack[matrixStack.length - 1].numbers = numbers))
         .catch(() => {});
     }
+  }
+
+  configureBinding(generatedMatrixEl, operationParamsEl) {
+    let ithParam = 0;
+    let isConfigurable = this.getParams().configurableParams;
+    for (let c = 0; c < matrixDimension * matrixDimension; c++) {
+      if (isConfigurable & (1 << c)) {
+        const matrixValueEl = generatedMatrixEl.querySelector(
+          `.matrix-value:nth-of-type(${c + 1})`
+        );
+        const paramValueEl = operationParamsEl.querySelector(
+          `.parameter:nth-of-type(${ithParam + 1})`
+        );
+        binder.bind(this.onParameterChanged, matrixValueEl, paramValueEl);
+
+        ithParam++;
+      }
+    }
+  }
+
+  onParameterChanged() {
+    // assembles a 1d array of the generated matrix
+    const generated = Array.from(
+      generatedMatrixEl.querySelectorAll(".matrix-value")
+    ).map(el => parseFloat(el.value.trim() || "0"));
+    // writes the 1d array result back into the resulting matrix
+    const resultingEls = resultingMatrixEl.querySelectorAll(".matrix-value");
+    resultingEls.forEach((el, i) => (el.value = resultsArray[i]));
   }
 
   getParams() {
@@ -113,9 +146,9 @@ class LoadMatrixButton extends Button {
       showLeftMatrix: false,
       showMiddleMatrix: true,
       showRightMatrix: false,
-      params: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      configurableParams: 0b1111111111111111,
       openGLCommands: [
-        "GLfloat mat[] = { @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input };",
+        "GLfloat mat[] = { @input:1, @input:0, @input:0, @input:0, @input:0, @input:1, @input:0, @input:0, @input:0, @input:0, @input:1, @input:0, @input:0, @input:0, @input:0, @input:1 };",
         "glLoadMatrixf(mat);"
       ]
     };
@@ -128,11 +161,76 @@ class MultMatrixButton extends Button {
   }
 
   execute() {
-    if (Matrizes.length) {
-      openMatrixModal(this, Matrizes[Matrizes.length - 1].numbers)
-        .then(numbers => (Matrizes[Matrizes.length - 1].numbers = numbers))
+    if (matrixStack.length) {
+      openMatrixModal(this, matrixStack[matrixStack.length - 1].numbers)
+        .then(numbers => (matrixStack[matrixStack.length - 1].numbers = numbers))
         .catch(() => {});
     }
+  }
+
+  configureBinding(generatedMatrixEl, operationParamsEl) {
+    let ithParam = 0;
+    let isConfigurable = this.getParams().configurableParams;
+    for (let c = 0; c < matrixDimension * matrixDimension; c++) {
+      if (isConfigurable & (1 << c)) {
+        const matrixValueEl = generatedMatrixEl.querySelector(
+          `.matrix-value:nth-of-type(${c + 1})`
+        );
+        const paramValueEl = operationParamsEl.querySelector(
+          `.parameter:nth-of-type(${ithParam + 1})`
+        );
+        binder.bind(this.onParameterChanged, matrixValueEl, paramValueEl);
+
+        ithParam++;
+      }
+    }
+  }
+
+  onParameterChanged() {
+    const modalMatrixEl = document.querySelector("#modal-matrix");
+    const currentMatrixEl = modalMatrixEl.querySelector("#mat-left");
+    const generatedMatrixEl = modalMatrixEl.querySelector("#mat-top");
+    const resultingMatrixEl = modalMatrixEl.querySelector("#mat-right");
+    // assembles a 1d array of the current matrix
+    const currents = Array.from(
+      currentMatrixEl.querySelectorAll(".matrix-value")
+    ).map(el => parseFloat(el.value.trim() || "0"));
+
+    // assembles a 1d array of the generated matrix
+    const generated = Array.from(
+      generatedMatrixEl.querySelectorAll(".matrix-value")
+    ).map(el => parseFloat(el.value.trim() || "0"));
+
+    // executes the multiplication
+    const resultsArray = MultMatrixButton.multiplyMatrices(currents, generated);
+
+    // writes the 1d array result back into the resulting matrix
+    const resultingEls = resultingMatrixEl.querySelectorAll(".matrix-value");
+    resultingEls.forEach((el, i) => (el.value = resultsArray[i]));
+  }
+
+  static multiplyMatrices(left, right) {
+    const asMatrix = (array, i, j) => array[j * matrixDimension + i];
+    const setAsMatrix = (array, i, j, value) =>
+      (array[j * matrixDimension + i] = value);
+    const sumAsMatrix = (array, i, j, value) =>
+      (array[j * matrixDimension + i] += value);
+    const result = [];
+
+    for (let j = 0; j < matrixDimension; j++) {
+      for (let i = 0; i < matrixDimension; i++) {
+        setAsMatrix(result, i, j, 0);
+
+        for (let k = 0; k < matrixDimension; k++) {
+          const leftValue = asMatrix(left, i, k);
+          const rightValue = asMatrix(right, k, j);
+          const value = leftValue * rightValue;
+          sumAsMatrix(result, i, j, value);
+        }
+      }
+    }
+
+    return result;
   }
 
   getParams() {
@@ -140,9 +238,9 @@ class MultMatrixButton extends Button {
       showLeftMatrix: true,
       showMiddleMatrix: true,
       showRightMatrix: true,
-      params: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      configurableParams: 0b1111111111111111,
       openGLCommands: [
-        "GLfloat mat[] = { @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input, @input };",
+        "GLfloat mat[] = { @input:1, @input:0, @input:0, @input:0, @input:0, @input:1, @input:0, @input:0, @input:0, @input:0, @input:1, @input:0, @input:0, @input:0, @input:0, @input:1 };",
         "glMultMatrixf(mat);"
       ]
     };
@@ -156,25 +254,101 @@ class TranslateButton extends MultMatrixButton {
 
   getParams() {
     return Object.assign({}, super.getParams(), {
-      params: [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        false
-      ],
-      openGLCommands: ["glTranslatef(@input, @input, @input)"]
+      configurableParams: 0b111000000000000,
+      openGLCommands: ["glTranslatef(@input:0, @input:0, @input:0);"]
+    });
+  }
+}
+
+class ScaleButton extends MultMatrixButton {
+  constructor(x, y, width, height) {
+    super("glScale(...)", x, y, width, height);
+  }
+
+  getParams() {
+    return Object.assign({}, super.getParams(), {
+      configurableParams: 0b000010000100001,
+      openGLCommands: ["glScalef(@input:1, @input:1, @input:1);"]
+    });
+  }
+}
+
+class RotateButton extends MultMatrixButton {
+  constructor(x, y, width, height) {
+    super("glRotate(...)", x, y, width, height);
+  }
+
+  configureBinding(generatedMatrixEl, operationParamsEl) {
+    const parameterEls = Array.from(
+      operationParamsEl.querySelectorAll(".parameter")
+    );
+    const [angleEl, xEl, yEl, zEl] = parameterEls;
+    const impactedGeneratedMatrixValueEls = Array.from(
+      generatedMatrixEl.querySelectorAll(".matrix-value")
+    ).filter(
+      (_, i) =>
+        i < matrixDimension * (matrixDimension - 1) &&
+        (i + 1) % matrixDimension !== 0
+    );
+
+    binder.watchAndTransform(
+      this.onParameterChanged,
+      () => {
+        const parameters = parameterEls.map(el => parseFloat(el.value || "0"));
+
+        // gets the angle and the xyz rotation axis
+        let [angle, ...rotationAxis] = parameters;
+        // finds the norm
+        const rotationAxisNormSquared = rotationAxis.reduce(
+          (accum, n) => accum + n * n,
+          0
+        );
+        const rotationAxisNorm =
+          rotationAxisNormSquared > 0 ? Math.sqrt(rotationAxisNormSquared) : 0;
+
+        // normalizes the axis
+        if (rotationAxisNorm) {
+          rotationAxis = rotationAxis.map(d => d / rotationAxisNorm);
+        }
+
+        // defines the new value for each matrix element according to
+        // the euler rotation matrix (http://www.dei.isep.ipp.pt/~matos/cg/docs/manual/glRotate.3G.html)
+        angle *= Math.PI / 180;
+        const cosine = Math.cos(angle);
+        const sine = Math.sin(angle);
+        const [x, y, z] = rotationAxis;
+
+        let matrixValues = [
+          x ** 2 * (1 - cosine) + cosine,
+          y * x * (1 - cosine) + z * cosine,
+          x * z * (1 - cosine) - y * sine,
+          x * y * (1 - cosine) - z * sine,
+          y ** 2 * (1 - cosine) + cosine,
+          y * z * (1 - cosine) + x * sine,
+          x * z * (1 - cosine) + y * sine,
+          y * z * (1 - cosine) - x * sine,
+          z ** 2 * (1 - cosine) + cosine
+        ];
+
+        // checks if number is too close to zero... if it is, sets to 0
+        matrixValues = matrixValues.map(v =>
+          Math.abs(v) < Number.EPSILON ? 0 : v
+        );
+
+        // changes the values of the elements in the upper-left submatrix
+        impactedGeneratedMatrixValueEls.forEach(
+          (el, i) => (el.value = matrixValues[i])
+        );
+      },
+      ...parameterEls,
+      ...impactedGeneratedMatrixValueEls
+    );
+  }
+
+  getParams() {
+    return Object.assign({}, super.getParams(), {
+      configurableParams: 0b0,
+      openGLCommands: ["glRotatef(@input:0, @input:0, @input:0, @input:1);"]
     });
   }
 }
@@ -199,8 +373,8 @@ let buttons = [
   new PushMatrixButton(455, dimensions.height - 80, 112, 25),
   new PopMatrixButton(455, dimensions.height - 50, 105, 25),
   new TranslateButton(35, dimensions.height - 180, 110, 25),
-  new DisabledButton("glScale(...)", 35, dimensions.height - 150, 90, 25),
-  new DisabledButton("glRotate(...)", 35, dimensions.height - 120, 90, 25),
+  new ScaleButton(35, dimensions.height - 150, 90, 25),
+  new RotateButton(35, dimensions.height - 120, 90, 25),
   new LoadMatrixButton(35, dimensions.height - 80, 120, 25),
   new MultMatrixButton("glMultMatrix(...)", 35, dimensions.height - 50, 115, 25)
 ];
@@ -285,7 +459,7 @@ class Matrix {
       for (let j = 0; j < this.size; j++) {
         const posX = x + Matrix.characterSpacing * (j - (this.size - 1) / 2);
         const posY = y + Matrix.characterSpacing * (i - (this.size - 1) / 2);
-        text(this.numbers[i * this.size + j], posX, posY);
+        text(this.numbers[i + j * this.size], posX, posY);
       }
     }
   }
@@ -356,42 +530,20 @@ function mainScreen() {
     button.draw();
   }
 
-  if (Matrizes.length > 0) {
+  if (matrixStack.length > 0) {
     text(
       "Atual",
-      Matrizes[Matrizes.length - 1].pos.x + Matrix.size(4) * 0.5,
-      Matrizes[Matrizes.length - 1].pos.y
+      matrixStack[matrixStack.length - 1].pos.x + Matrix.size(4) * 0.5,
+      matrixStack[matrixStack.length - 1].pos.y
     );
   }
-  for (var i = Matrizes.length - 1; i >= 0; i--) {
-    if (!Matrizes[i].bot) {
-      Matrizes[i].drop();
+  for (var i = matrixStack.length - 1; i >= 0; i--) {
+    if (!matrixStack[i].bot) {
+      matrixStack[i].drop();
     }
-    Matrizes[i].draw();
+    matrixStack[i].draw();
   }
 }
-
-// function insertedMatrix(matrix) {
-// 	matrix[0] = document.getElementById("r1c1").value;
-// 	matrix[1] = document.getElementById("r1c2").value;
-// 	matrix[2] = document.getElementById("r1c3").value;
-// 	matrix[3] = document.getElementById("r1c4").value;
-//
-// 	matrix[4] = document.getElementById("r2c1").value;
-// 	matrix[5] = document.getElementById("r2c2").value;
-// 	matrix[6] = document.getElementById("r2c3").value;
-// 	matrix[7] = document.getElementById("r2c4").value;
-//
-// 	matrix[8] = document.getElementById("r3c1").value;
-// 	matrix[9] = document.getElementById("r3c2").value;
-// 	matrix[10] = document.getElementById("r3c3").value;
-// 	matrix[11] = document.getElementById("r3c4").value;
-//
-// 	matrix[12] = document.getElementById("r4c1").value;
-// 	matrix[13] = document.getElementById("r4c2").value;
-// 	matrix[14] = document.getElementById("r4c3").value;
-// 	matrix[15] = document.getElementById("r4c4").value;
-// }
 
 function mouseClicked() {
   for (button of buttons) {
@@ -416,7 +568,7 @@ function setup() {
   arrayCopy(id, id2);
   var d3 = [];
   arrayCopy(id, d3);
-  Matrizes.push(new Matrix(id, dimensions.height - Matrix.size(4) / 2));
+  matrixStack.push(new Matrix(id, dimensions.height - Matrix.size(4) / 2));
   canvas.parent("holder");
 }
 
