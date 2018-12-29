@@ -1,3 +1,7 @@
+:root {
+  --highlight-duration: 400ms;
+}
+
 h1 {
   font-family: "Amatic SC", cursive;
 }
@@ -91,7 +95,7 @@ h1 {
 .parameter {
   transition-property: transform, outline, z-index;
   transition-timing-function: ease-out;
-  transition-duration: 400ms;
+  transition-duration: var(--highlight-duration);
   transform: scale(1);
   outline: 0px solid yellow;
   z-index: 0;

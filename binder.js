@@ -1,4 +1,10 @@
 (function(global) {
+  const highlightDuration = parseFloat(
+    global
+      .getComputedStyle(document.body)
+      .getPropertyValue("--highlight-duration") || "0"
+  );
+
   const highlightElements = (elements, changedElement, changeListener) => {
     const newValue = changedElement.value;
 
@@ -18,7 +24,7 @@
         el.dataset.transitionTimeoutId = setTimeout(() => {
           el.classList.remove("just-changed");
           delete el.dataset.transitionTimeoutId;
-        }, 400);
+        }, highlightDuration);
       });
   };
 
@@ -45,7 +51,7 @@
           highlightElements(elements, changedElement, changeListener);
           elements
             .filter(el => el !== changedElement)
-            .forEach(el => el.value = changedElement.value);
+            .forEach(el => (el.value = changedElement.value));
         }
       });
     },
