@@ -13,6 +13,9 @@ var actual = 0;
 var tam = 1;
 var mulTam = 0.001;
 var canvas;
+let isModalOpen = false;
+let buttonsFont = null;
+let matrixFont = null;
 
 class Button {
   constructor(text, x, y, width, height) {
@@ -24,17 +27,15 @@ class Button {
   }
 
   draw() {
+    strokeWeight(1);
     if (this.hover) {
       strokeWeight(2);
     }
     stroke(0, 0, 0);
     rect(this.x, this.y, this.width, this.height);
     textSize(15);
+    strokeWeight(0);
     text(this.text, this.x + 5, this.y + 20);
-
-    if (this.hover) {
-      strokeWeight(1);
-    }
   }
 
   mouseover() {
@@ -455,6 +456,7 @@ class Matrix {
     stroke(0);
 
     // numbers
+    textAlign(CENTER);
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
         const posX = x + Matrix.characterSpacing * (j - (this.size - 1) / 2);
@@ -462,6 +464,7 @@ class Matrix {
         text(this.numbers[i + j * this.size], posX, posY);
       }
     }
+    textAlign(LEFT);
   }
 
   drop() {
@@ -500,7 +503,7 @@ function ButtonChangeMatrix() {
   text("glLoadMatrix(...)", 461, 320);
 }
 
-function cloud(x, y) {
+function cloud(x, y, tam) {
   push();
   noStroke();
   fill(255, 255, 255, 200);
@@ -514,18 +517,20 @@ function cloud(x, y) {
 function mainScreen() {
   background(255, 255, 233, 80);
   background(0, 191, 255, 200);
-  cloud(100, 180);
-  cloud(400, 100);
   tam += mulTam;
   if (tam >= 1.1 || tam <= 0.9) {
     mulTam *= -1;
   }
+  cloud(100, 180, tam);
+  cloud(400, 100, tam*1.05);
   push();
   noStroke();
   fill(100, 255, 100);
   rect(0, height - 50, width, 50);
   pop();
 
+  textFont(buttonsFont);
+  strokeWeight(0);
   for (button of buttons) {
     button.draw();
   }
@@ -537,7 +542,10 @@ function mainScreen() {
       matrixStack[matrixStack.length - 1].pos.y
     );
   }
-  for (var i = matrixStack.length - 1; i >= 0; i--) {
+
+  textFont(matrixFont);
+  strokeWeight(1);
+  for (let i = matrixStack.length - 1; i >= 0; i--) {
     if (!matrixStack[i].bot) {
       matrixStack[i].drop();
     }
@@ -547,7 +555,7 @@ function mainScreen() {
 
 function mouseClicked() {
   for (button of buttons) {
-    if (button.isPointWithin(mouseX, mouseY)) {
+    if (!isModalOpen && button.isPointWithin(mouseX, mouseY)) {
       button.execute();
     }
   }
@@ -555,7 +563,7 @@ function mouseClicked() {
 
 function mouseMoved() {
   for (button of buttons) {
-    if (button.isPointWithin(mouseX, mouseY)) {
+    if (!isModalOpen && button.isPointWithin(mouseX, mouseY)) {
       button.mouseover();
     } else {
       button.mouseout();
@@ -568,10 +576,16 @@ function setup() {
   arrayCopy(id, id2);
   var d3 = [];
   arrayCopy(id, d3);
-  matrixStack.push(new Matrix(id, dimensions.height - Matrix.size(4) / 2));
+  matrixStack.push(new Matrix(id, dimensions.height - Matrix.size(matrixDimension) / 2));
   canvas.parent("holder");
 }
 
 function draw() {
   mainScreen();
+}
+
+
+function preload() {
+  buttonsFont = 'sans-serif';
+  matrixFont = 'Abel, sans-serif';
 }

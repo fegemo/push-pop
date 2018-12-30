@@ -31,6 +31,7 @@ function clearModalMatrices(currentMatrix) {
 }
 
 function openMatrixModal(operation, currentMatrix) {
+  isModalOpen = true;
   const modalMatrixEl = document.querySelector("#modal-matrix");
   const currentMatrixEl = modalMatrixEl.querySelector("#mat-left");
   const generatedMatrixEl = modalMatrixEl.querySelector("#mat-top");
@@ -108,17 +109,19 @@ function openMatrixModal(operation, currentMatrix) {
   return new Promise((resolve, reject) => {
     let matrix = currentMatrix;
 
-    let modalOkEl = modalMatrixEl.querySelector("#matrix-ok");
-    let modalCloseEls = modalMatrixEl.querySelectorAll(".close");
+    const modalOkEl = modalMatrixEl.querySelector("#matrix-ok");
+    const modalCloseEls = [...modalMatrixEl.querySelectorAll(".close"), ...modalMatrixEl.querySelectorAll(".modal-mask")];
 
     let closeModal = e => {
       // removes the click handler, as it is
       e.currentTarget.removeEventListener("click", okHandler);
+      modalCloseEls.forEach(el => el.removeEventListener("click", closeHandler));
 
       // triggers the closing animation
       modalMatrixEl.classList.remove("in");
       setTimeout(() => {
         modalMatrixEl.style.display = "none";
+        isModalOpen = false;
       }, 500);
     };
 

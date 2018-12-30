@@ -27,6 +27,28 @@ canvas {
   color: black;
 }
 
+.modal-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: #000;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 200ms ease-out;
+}
+
+.modal.in .modal-mask {
+  pointer-events: all;
+  opacity: 0.4;
+}
+
+.modal-dialog {
+  z-index: 1000;
+}
+
 .matrix-value {
   border: 1px solid;
   border-radius: 3px;
