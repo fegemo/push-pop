@@ -9,44 +9,116 @@ h1 {
 body {
   padding: 0;
   margin: 0;
-  height: 1080px;
   background: linear-gradient(#2a363b, #99b898);
   color: white;
   font-family: "Abel", sans-serif;
-  font-size: 3em;
 }
 
-canvas {
-  display: block;
-  margin: 40px auto;
-  border: 2px solid;
-  border-radius: 10px;
+body > header > h1 {
+  text-align: center;
 }
 
-#modal-matrix {
-  color: black;
+#holder + p {
+  background-color: #f393;
 }
 
-.modal-mask {
-  position: fixed;
+p {
+  text-align: justify;
+  padding: 0.75em 1em;
+  font-size: 1.5em;
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  margin: 1.5em 1.5em;
+}
+
+@media (min-width: 1000px) {
+  h1 {
+    font-size: 4em;
+  }
+
+  #container {
+    display: grid;
+    grid-template-areas: "canvas meta"
+                         "canvas info"
+                         "canvas footer";
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-gap: 1em;
+  }
+
+  #holder {
+    grid-area: canvas;
+  }
+
+  #holder + p {
+    grid-area: meta;
+  }
+
+  #holder + #explanation {
+    grid-area: info;
+  }
+
+  #explanation + footer {
+    grid-area: footer;
+  }
+}
+
+#holder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+#canvas-container {
+  position: relative;
+}
+
+#buttons-container {
+  position: absolute;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: #000;
-  z-index: 100;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 200ms ease-out;
+  display: grid;
+  grid-template-areas: "top top top"
+                       "bottom-left-1 mid bottom-right-1"
+                       "bottom-left-2 mid bottom-right-2"
+                       "bottom-left-3 mid bottom-right-3"
+                       "bottom-left-4 mid bottom-right-4"
+                       "bottom-left-5 mid bottom-right-5"
+                       "bottom-left-6 mid bottom-right-6";
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: 1fr auto auto auto auto auto auto;
+  grid-row-gap: 0.25em;
+  padding: 2em 1em;
 }
 
-.modal.in .modal-mask {
-  pointer-events: all;
-  opacity: 0.4;
+@media (max-width: 640px) {
+  #buttons-container {
+    font-size: 0.9em;
+  }
 }
 
-.modal-dialog {
-  z-index: 1000;
+@media (max-width: 400px) {
+  #buttons-container {
+    font-size: 0.8em;
+  }
+}
+
+@media (max-width: 340px) {
+  #buttons-container {
+    font-size: 0.7em;
+  }
+}
+
+canvas {
+  overflow-x: hidden;
+  border: 2px solid;
+  border-radius: 10px;
 }
 
 .matrix-value {
@@ -57,10 +129,6 @@ canvas {
   text-align: center;
 }
 
-h1 {
-  font-size: 2em;
-}
-
 .mat {
   text-align: center;
   display: grid;
@@ -68,10 +136,6 @@ h1 {
   grid-gap: 0.15em;
   justify-content: center;
   font-size: 0.75em;
-}
-
-.modal-dialog {
-  min-width: 800px;
 }
 
 #matrices {
@@ -138,4 +202,8 @@ input[type="number"]::-webkit-inner-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+button {
+  cursor: pointer;
 }

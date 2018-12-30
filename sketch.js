@@ -1,6 +1,8 @@
 const dimensions = {
   width: 600,
-  height: 600
+  height: 600,
+  minHorizontalMargin: 10,
+  scaleFactor: 1
 };
 const matrixDimension = 4;
 var xAxis = dimensions.width / 2;
@@ -16,43 +18,33 @@ var canvas;
 let isModalOpen = false;
 let buttonsFont = null;
 let matrixFont = null;
+let buttons = [];
 
 class Button {
-  constructor(text, x, y, width, height) {
-    this.text = text;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+  constructor(text, region) {
+    this.button = createButton(text);
+    this.button.style("grid-area", region);
+    this.button.style("font-size", `${dimensions.scaleFactor * 100}%`);
+    this.button.mousePressed(this.execute.bind(this));
+    this.button.mouseOver(this.showExplanation.bind(this));
+    this.button.mouseOut(this.hideExplanation.bind(this));
+    this.button.parent("#buttons-container");
   }
 
-  draw() {
-    strokeWeight(1);
-    if (this.hover) {
-      strokeWeight(2);
-    }
-    stroke(0, 0, 0);
-    rect(this.x, this.y, this.width, this.height);
-    textSize(15);
-    strokeWeight(0);
-    text(this.text, this.x + 5, this.y + 20);
+  showExplanation() {
+    const { title, description, moreInfo } = this.getExplanation();
+    const explanationEl = document.querySelector("#explanation");
+    explanationEl.querySelector("h2").innerHTML = title;
+    explanationEl.querySelector("p").innerHTML = description;
+    explanationEl.querySelector(
+      ".more-info"
+    ).innerHTML = `Mais informações: <a href="${moreInfo}" target="_blank">${moreInfo}</a>`;
+    explanationEl.removeAttribute("hidden");
   }
 
-  mouseover() {
-    this.hover = true;
-  }
-
-  mouseout() {
-    this.hover = false;
-  }
-
-  isPointWithin(x, y) {
-    return (
-      this.x <= x &&
-      this.x + this.width >= x &&
-      this.y <= y &&
-      this.y + this.height >= y
-    );
+  hideExplanation() {
+    const explanationEl = document.querySelector("#explanation");
+    explanationEl.setAttribute("hidden", true);
   }
 
   execute() {
@@ -62,11 +54,15 @@ class Button {
   configureBinding(matricesEl) {
     alert("Ainda não implementado");
   }
+
+  getExplanation() {
+    alert("Ainda não implementado");
+  }
 }
 
 class PushMatrixButton extends Button {
-  constructor(x, y, width, height) {
-    super("glPushMatrix( )", x, y, width, height);
+  constructor(region) {
+    super("glPushMatrix( )", region);
   }
 
   execute() {
@@ -89,27 +85,47 @@ class PushMatrixButton extends Button {
       }
     }
   }
+
+  getExplanation() {
+    return {
+      title: "glPushMatrix();",
+      description:
+        "Clona a matriz que está no topo da pilha corrente e a empilha",
+      moreInfo: "http://google.com/"
+    };
+  }
 }
 
 class PopMatrixButton extends Button {
-  constructor(x, y, width, height) {
-    super("glPopMatrix( )", x, y, width, height);
+  constructor(region) {
+    super("glPopMatrix( )", region);
   }
 
   execute() {
     matrixStack.splice(matrixStack.length - 1, 1);
   }
+
+  getExplanation() {
+    return {
+      title: "glPopMatrix();",
+      description:
+      "Remove a matriz que está no topo da pilha corrente, voltando com a matriz anterior",
+      moreInfo: "http://google.com/"
+    };
+  }
 }
 
 class LoadMatrixButton extends Button {
-  constructor(x, y, width, height) {
-    super("glLoadMatrix(...)", x, y, width, height);
+  constructor(region) {
+    super("glLoadMatrix(...)", region);
   }
 
   execute() {
     if (matrixStack.length > 0) {
       openMatrixModal(this, matrixStack[matrixStack.length - 1].numbers)
-        .then(numbers => (matrixStack[matrixStack.length - 1].numbers = numbers))
+        .then(
+          numbers => (matrixStack[matrixStack.length - 1].numbers = numbers)
+        )
         .catch(() => {});
     }
   }
@@ -154,17 +170,28 @@ class LoadMatrixButton extends Button {
       ]
     };
   }
+
+  getExplanation() {
+    return {
+      title: "glLoadMatrix(float*);",
+      description:
+      "Carrega o array de 16 <code>floats</code> passado como parâmetro na matriz que está no topo da pilha de matrizes corrente",
+      moreInfo: "http://google.com/"
+    };
+  }
 }
 
 class MultMatrixButton extends Button {
-  constructor(text, x, y, width, height) {
-    super(text, x, y, width, height);
+  constructor(text, region) {
+    super(text, region);
   }
 
   execute() {
     if (matrixStack.length) {
       openMatrixModal(this, matrixStack[matrixStack.length - 1].numbers)
-        .then(numbers => (matrixStack[matrixStack.length - 1].numbers = numbers))
+        .then(
+          numbers => (matrixStack[matrixStack.length - 1].numbers = numbers)
+        )
         .catch(() => {});
     }
   }
@@ -246,11 +273,20 @@ class MultMatrixButton extends Button {
       ]
     };
   }
+
+  getExplanation() {
+    return {
+      title: "glMultMatrix(float*);",
+      description:
+      "Multiplica a matriz que está no topo da pilha de matrizes corrente por uma matriz formada pelo array de 16 <code>floats</code> passado como parâmetro",
+      moreInfo: "http://google.com/"
+    };
+  }
 }
 
 class TranslateButton extends MultMatrixButton {
-  constructor(x, y, width, height) {
-    super("glTranslate(...)", x, y, width, height);
+  constructor(region) {
+    super("glTranslate(...)", region);
   }
 
   getParams() {
@@ -259,11 +295,20 @@ class TranslateButton extends MultMatrixButton {
       openGLCommands: ["glTranslatef(@input:0, @input:0, @input:0);"]
     });
   }
+
+  getExplanation() {
+    return {
+      title: "glTranslatef(float, float, float);",
+      description:
+      "Gera uma matriz de translação e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
+      moreInfo: "http://google.com/"
+    };
+  }
 }
 
 class ScaleButton extends MultMatrixButton {
-  constructor(x, y, width, height) {
-    super("glScale(...)", x, y, width, height);
+  constructor(region) {
+    super("glScale(...)", region);
   }
 
   getParams() {
@@ -272,11 +317,20 @@ class ScaleButton extends MultMatrixButton {
       openGLCommands: ["glScalef(@input:1, @input:1, @input:1);"]
     });
   }
+
+  getExplanation() {
+    return {
+      title: "glScalef(float, float, float);",
+      description:
+      "Gera uma matriz de escala e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
+      moreInfo: "http://google.com/"
+    };
+  }
 }
 
 class RotateButton extends MultMatrixButton {
-  constructor(x, y, width, height) {
-    super("glRotate(...)", x, y, width, height);
+  constructor(region) {
+    super("glRotate(...)", region);
   }
 
   configureBinding(generatedMatrixEl, operationParamsEl) {
@@ -352,33 +406,23 @@ class RotateButton extends MultMatrixButton {
       openGLCommands: ["glRotatef(@input:0, @input:0, @input:0, @input:1);"]
     });
   }
+
+  getExplanation() {
+    return {
+      title: "glRotatef(float, float, float, float);",
+      description:
+      "Gera uma matriz de rotação dada por um ângulo e um eixo de rotação e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
+      moreInfo: "http://google.com/"
+    };
+  }
 }
 
 class DisabledButton extends Button {
-  constructor(text, x, y, width, height) {
-    super(text, x, y, width, height);
-  }
-
-  draw() {
-    stroke(0, 0, 0);
-    // fill(100, 100, 100);
-    rect(this.x, this.y, this.width, this.height);
-    // fill(255, 255, 255);
-    textSize(15);
-    text(this.text, this.x + 5, this.y + 20);
-    // fill(0, 0, 0);
+  constructor(text, region) {
+    super(text, region);
+    this.button.disabled();
   }
 }
-
-let buttons = [
-  new PushMatrixButton(455, dimensions.height - 80, 112, 25),
-  new PopMatrixButton(455, dimensions.height - 50, 105, 25),
-  new TranslateButton(35, dimensions.height - 180, 110, 25),
-  new ScaleButton(35, dimensions.height - 150, 90, 25),
-  new RotateButton(35, dimensions.height - 120, 90, 25),
-  new LoadMatrixButton(35, dimensions.height - 80, 120, 25),
-  new MultMatrixButton("glMultMatrix(...)", 35, dimensions.height - 50, 115, 25)
-];
 
 class Matrix {
   constructor(numbers, bottomLimit) {
@@ -481,28 +525,6 @@ class Matrix {
   }
 }
 
-function ButtonPush() {
-  stroke(0, 0, 0);
-  rect(35, 350, 112, 25);
-  textSize(15);
-  text("glPushMatrix( )", 41, 367);
-}
-
-function ButtonPop() {
-  stroke(0, 0, 0);
-  rect(455, 350, 105, 25);
-  textSize(15);
-  text("glPopMatrix( )", 461, 367);
-}
-
-function ButtonChangeMatrix() {
-  stroke(0, 0, 0);
-  rect(455, 350, 105, 25);
-  rect(455, 300, 120, 25);
-  textSize(15);
-  text("glLoadMatrix(...)", 461, 320);
-}
-
 function cloud(x, y, tam) {
   push();
   noStroke();
@@ -515,6 +537,7 @@ function cloud(x, y, tam) {
 }
 
 function mainScreen() {
+  scale(dimensions.scaleFactor);
   background(255, 255, 233, 80);
   background(0, 191, 255, 200);
   tam += mulTam;
@@ -522,18 +545,12 @@ function mainScreen() {
     mulTam *= -1;
   }
   cloud(100, 180, tam);
-  cloud(400, 100, tam*1.05);
+  cloud(400, 100, tam * 1.05);
   push();
   noStroke();
   fill(100, 255, 100);
-  rect(0, height - 50, width, 50);
+  rect(0, dimensions.height - 50, dimensions.width, 50);
   pop();
-
-  textFont(buttonsFont);
-  strokeWeight(0);
-  for (button of buttons) {
-    button.draw();
-  }
 
   if (matrixStack.length > 0) {
     text(
@@ -553,39 +570,67 @@ function mainScreen() {
   }
 }
 
-function mouseClicked() {
-  for (button of buttons) {
-    if (!isModalOpen && button.isPointWithin(mouseX, mouseY)) {
-      button.execute();
-    }
-  }
-}
-
-function mouseMoved() {
-  for (button of buttons) {
-    if (!isModalOpen && button.isPointWithin(mouseX, mouseY)) {
-      button.mouseover();
-    } else {
-      button.mouseout();
-    }
-  }
-}
-
 function setup() {
-  canvas = createCanvas(dimensions.width, dimensions.height);
+  // determines the size of the canvas so it fits smaller screens nicely
+  if (windowWidth >= 320 && windowWidth <= dimensions.width) {
+    const desiredAspectRatio = dimensions.width / dimensions.height;
+    canvas = createCanvas(
+      windowWidth - dimensions.minHorizontalMargin * 2,
+      (windowWidth - dimensions.minHorizontalMargin * 2) * desiredAspectRatio
+    );
+    dimensions.scaleFactor =
+      (windowWidth - dimensions.minHorizontalMargin * 2) / dimensions.width;
+  } else {
+    canvas = createCanvas(dimensions.width, dimensions.height);
+    dimensions.scaleFactor = 1;
+  }
+
   arrayCopy(id, id2);
   var d3 = [];
   arrayCopy(id, d3);
-  matrixStack.push(new Matrix(id, dimensions.height - Matrix.size(matrixDimension) / 2));
-  canvas.parent("holder");
+  matrixStack.push(
+    new Matrix(id, dimensions.height - Matrix.size(matrixDimension) / 2)
+  );
+  canvas.id("main-canvas").parent("#canvas-container");
+
+  // creates buttons
+  let buttons = [
+    new PushMatrixButton("bottom-right-5"),
+    new PopMatrixButton("bottom-right-6"),
+    new TranslateButton("bottom-left-1"),
+    new ScaleButton("bottom-left-2"),
+    new RotateButton("bottom-left-3"),
+    new LoadMatrixButton("bottom-left-5"),
+    new MultMatrixButton("glMultMatrix(...)", "bottom-left-6")
+  ];
+}
+
+function windowResized() {
+  if (windowWidth >= 320 && windowWidth <= dimensions.width) {
+    const desiredAspectRatio = dimensions.width / dimensions.height;
+    resizeCanvas(
+      windowWidth - dimensions.minHorizontalMargin * 2,
+      (windowWidth - dimensions.minHorizontalMargin * 2) / desiredAspectRatio,
+      false
+    );
+  }
+
+  dimensions.scaleFactor = Math.min(
+    1,
+    (windowWidth - dimensions.minHorizontalMargin * 2) / dimensions.width
+  );
+
+  buttons.forEach(b => {
+    b.button.position(x * dimensions.scaleFactor, y * dimensions.scaleFactor);
+    b.button.style("font-size", `${dimensions.scaleFactor * 100}%`);
+  });
 }
 
 function draw() {
   mainScreen();
 }
 
-
 function preload() {
-  buttonsFont = 'sans-serif';
-  matrixFont = 'Abel, sans-serif';
+  buttonsFont = "sans-serif";
+  matrixFont = "Abel, sans-serif";
 }

@@ -1,121 +1,130 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>Push Pop Matrix Tutorial</title>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Amatic+SC|Abel">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-	<link rel="stylesheet" type="text/css" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Push Pop Matrix Tutorial</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Amatic+SC|Abel">
+  <link rel="stylesheet" type="text/css" href="reset.css">
+  <link rel="stylesheet" type="text/css" href="modal.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-	<div class="container">
-		<div class="row">
-			<div class="col-md-offset-2 col-md-8">
-				<h1>Bem vindo ao tutorial Push/Pop matrix!!</h1>
-			</div>
-		</div>
-		<div class="row">
-			<div id="bg" class="gameBg col-md-8">
-				<div id="holder"></div>
-			</div>
+  <header>
+    <h1>Tutorial de matrizes <strong>OpenGL</strong>!!</h1>
+  </header>
+  <div id="container">
+    <main id="holder">
+      <div id="canvas-container">
+        <div id="buttons-container"></div>
+      </div>
+    </main>
+    <p>
+      Esta explicação interativa tem o intuito de mostrar o funcionamento
+      das funções de matrizes do OpenGL e como funcionam as pilhas de matrizes,
+      além da composição de transformações.
+    </p>
+    <section id="explanation" hidden>
+      <h2>Referência</h2>
+      <p></p>
+      <span class="more-info"></span>
+    </section>
+    <footer>
+      <p>
+        Esta foi uma iniciativa do aluno <a href="mailto:">Higor Fischer</a>
+        e do professor <a href="mailto:fegemo@cefetmg.br">Flávio Coutinho</a>.
+      </p>
+    </footer>
+  </div>
 
-			<div class=" col-md-offset-1 col-md-3">
-				<h2>Esse site tem o intuito de mostrar o funcionamento da pilha
-					e também como ocorrem as transformações de matrizes.
-				</h2>
-			</div>
-		</div>
-	</div>
+  <div id="modal-matrix" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Descreva a matriz</h4>
+        </div>
+        <div class="modal-body" id="matrices">
+          <h5 id="current-matrix">Matriz corrente</h5>
+          <h5 id="generated-matrix">Matriz gerada</h5>
+          <h5 id="resulting-matrix">Matriz resultante</h5>
+          <div class="matrix-description" id="mat-left">
+            <div class="mat">
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+            </div>
+            &times;
+          </div>
+          <div class="matrix-description" id="mat-top">
+            <div class="mat">
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+            </div>
+          </div>
+          <div class="matrix-description" id="mat-right">
+            =
+            <div class="mat">
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0"  disabled>
+              <input value="1" class="matrix-value" type="number" placeholder="0"  disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0"  disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0"  disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="0" class="matrix-value" type="number" placeholder="0" disabled>
+              <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
+            </div>
+          </div>
+          <div id="operation-params"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="matrix-ok">Ok</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-mask"></div>
+  </div>
 
-	<div id="modal-matrix" class="modal fade" tabindex="-1" role="dialog">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title">Descreva a matriz</h4>
-				</div>
-				<div class="modal-body" id="matrices">
-					<h5 id="current-matrix">Matriz corrente</h5>
-					<h5 id="generated-matrix">Matriz gerada</h5>
-					<h5 id="resulting-matrix">Matriz resultante</h5>
-					<div class="matrix-description" id="mat-left">
-						<div class="mat">
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-						</div>
-						&times;
-					</div>
-					<div class="matrix-description" id="mat-top">
-						<div class="mat">
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-						</div>
-					</div>
-					<div class="matrix-description" id="mat-right">
-						=
-						<div class="mat">
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0"  disabled>
-							<input value="1" class="matrix-value" type="number" placeholder="0"  disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0"  disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0"  disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="0" class="matrix-value" type="number" placeholder="0" disabled>
-							<input value="1" class="matrix-value" type="number" placeholder="0" disabled>
-						</div>
-					</div>
-					<div id="operation-params">
-						<!-- <pre><code>glTranslatef(<input type="number" class="parameter float-parameter">, <input type="number" class="parameter float-parameter">, <input type="number" class="parameter float-parameter">)</code></pre> -->
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" id="matrix-ok">Ok</button>
-				</div>
-			</div>
-		</div>
-		<div class="modal-mask"></div>
-	</div>
-	<script src="libraries/p5.js" type="text/javascript"></script>
-	<script src="libraries/p5.dom.js" type="text/javascript"></script>
-	<script src="binder.js" type="text/javascript"></script>
-	<script src="modal.js" type="text/javascript"></script>
-	<script src="sketch.js" type="text/javascript"></script>
+  <script src="libraries/p5.js" type="text/javascript"></script>
+  <script src="libraries/p5.dom.js" type="text/javascript"></script>
+  <script src="binder.js" type="text/javascript"></script>
+  <script src="modal.js" type="text/javascript"></script>
+  <script src="sketch.js" type="text/javascript"></script>
 </body>
-
 </html>
