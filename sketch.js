@@ -34,17 +34,21 @@ class Button {
   showExplanation() {
     const { title, description, moreInfo } = this.getExplanation();
     const explanationEl = document.querySelector("#explanation");
-    explanationEl.querySelector("h2").innerHTML = title;
-    explanationEl.querySelector("p").innerHTML = description;
+    explanationEl.querySelector(".title").innerHTML = title;
+    explanationEl.querySelector(".description").innerHTML = description;
     explanationEl.querySelector(
       ".more-info"
     ).innerHTML = `Mais informações: <a href="${moreInfo}" target="_blank">${moreInfo}</a>`;
     explanationEl.removeAttribute("hidden");
+    explanationEl.classList.remove("invisible");
+    explanationEl.onTransitionEnd = null;
   }
 
   hideExplanation() {
     const explanationEl = document.querySelector("#explanation");
-    explanationEl.setAttribute("hidden", true);
+    explanationEl.classList.add("invisible");
+    explanationEl.onTransitionEnd = () =>
+      explanationEl.setAttribute("hidden", true);
   }
 
   execute() {
@@ -91,7 +95,7 @@ class PushMatrixButton extends Button {
       title: "glPushMatrix();",
       description:
         "Clona a matriz que está no topo da pilha corrente e a empilha",
-      moreInfo: "http://google.com/"
+      moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glPushMatrix.html"
     };
   }
 }
@@ -109,8 +113,8 @@ class PopMatrixButton extends Button {
     return {
       title: "glPopMatrix();",
       description:
-      "Remove a matriz que está no topo da pilha corrente, voltando com a matriz anterior",
-      moreInfo: "http://google.com/"
+        "Remove a matriz que está no topo da pilha corrente, voltando com a matriz anterior",
+      moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glPopMatrix.html"
     };
   }
 }
@@ -175,8 +179,8 @@ class LoadMatrixButton extends Button {
     return {
       title: "glLoadMatrix(float*);",
       description:
-      "Carrega o array de 16 <code>floats</code> passado como parâmetro na matriz que está no topo da pilha de matrizes corrente",
-      moreInfo: "http://google.com/"
+        "Carrega o array de 16 <code>floats</code> passado como parâmetro na matriz que está no topo da pilha de matrizes corrente",
+      moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glLoadMatrix.html"
     };
   }
 }
@@ -278,8 +282,8 @@ class MultMatrixButton extends Button {
     return {
       title: "glMultMatrix(float*);",
       description:
-      "Multiplica a matriz que está no topo da pilha de matrizes corrente por uma matriz formada pelo array de 16 <code>floats</code> passado como parâmetro",
-      moreInfo: "http://google.com/"
+        "Multiplica a matriz que está no topo da pilha de matrizes corrente por uma matriz formada pelo array de 16 <code>floats</code> passado como parâmetro",
+      moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glMultMatrix.html"
     };
   }
 }
@@ -298,10 +302,10 @@ class TranslateButton extends MultMatrixButton {
 
   getExplanation() {
     return {
-      title: "glTranslatef(float, float, float);",
+      title: "glTranslatef(float x, float y, float z);",
       description:
-      "Gera uma matriz de translação e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
-      moreInfo: "http://google.com/"
+        "Gera uma matriz de translação e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
+      moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glTranslate.html"
     };
   }
 }
@@ -320,10 +324,10 @@ class ScaleButton extends MultMatrixButton {
 
   getExplanation() {
     return {
-      title: "glScalef(float, float, float);",
+      title: "glScalef(float x, float y, float z);",
       description:
-      "Gera uma matriz de escala e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
-      moreInfo: "http://google.com/"
+        "Gera uma matriz de escala e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
+      moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glScale.html"
     };
   }
 }
@@ -409,10 +413,10 @@ class RotateButton extends MultMatrixButton {
 
   getExplanation() {
     return {
-      title: "glRotatef(float, float, float, float);",
+      title: "glRotatef(float alpha, float x, float y, float z);",
       description:
-      "Gera uma matriz de rotação dada por um ângulo e um eixo de rotação e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
-      moreInfo: "http://google.com/"
+        "Gera uma matriz de rotação dada por um ângulo e um eixo de rotação e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
+      moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glRotate.html"
     };
   }
 }
@@ -480,9 +484,9 @@ class Matrix {
 
     // right brackets
     rect(
-      x + (this.size / 2) * Matrix.characterSpacing - 22,
+      x + 5 + (this.size / 2) * Matrix.characterSpacing - 22,
       y - (this.size / 2) * Matrix.characterSpacing - 10,
-      22,
+      17,
       5
     );
     rect(
@@ -492,9 +496,9 @@ class Matrix {
       this.size * Matrix.characterSpacing
     );
     rect(
-      x + (this.size / 2) * Matrix.characterSpacing - 22,
+      x + 5 + (this.size / 2) * Matrix.characterSpacing - 22,
       y + (this.size / 2) * Matrix.characterSpacing - 10,
-      27,
+      22,
       5
     );
     stroke(0);

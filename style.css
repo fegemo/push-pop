@@ -2,6 +2,11 @@
   --highlight-duration: 400ms;
 }
 
+html,
+body {
+  min-height: 100%;
+}
+
 h1 {
   font-family: "Amatic SC", cursive;
 }
@@ -19,7 +24,8 @@ body > header > h1 {
 }
 
 #holder + p {
-  background-color: #f393;
+  background-color: rgba(255, 51, 153, 0.8);
+  margin-bottom: 0;
 }
 
 p {
@@ -34,6 +40,67 @@ p {
   margin: 1.5em 1.5em;
 }
 
+#explanation {
+  padding: 0.5em;
+  background-color: rgba(0, 0, 0, .7);
+  overflow-x: hidden;
+}
+
+#explanation > * {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: all 200ms ease-out;
+}
+
+#explanation.invisible > * {
+  opacity: 0;
+  transform: translate3d(-2rem, 0, 0);
+}
+
+#explanation > *:nth-child(2) {
+  transition-delay: 30ms;
+}
+
+#explanation > *:nth-child(4) {
+  transition-delay: 60ms;
+}
+
+.more-info {
+  font-size: 100%;
+  text-align: left;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+
+@media (max-width: 640px) {
+  #container {
+    margin: 1.5em 0;
+  }
+
+  #holder + p {
+    order: 4;
+  }
+
+  #explanation {
+    order: 3;
+    overflow-y: hidden;
+  }
+
+  footer {
+    order: 5;
+  }
+
+  #explanation > * {
+    transition-duration: 100ms;
+  }
+
+  #explanation.invisible > * {
+    opacity: 0;
+    transform: translate3d(0, 1rem, 0);
+  }
+
+}
+
 @media (min-width: 1000px) {
   h1 {
     font-size: 4em;
@@ -41,12 +108,14 @@ p {
 
   #container {
     display: grid;
-    grid-template-areas: "canvas meta"
-                         "canvas info"
-                         "canvas footer";
+    grid-template-areas:
+      "canvas meta"
+      "canvas info"
+      "canvas footer";
     grid-template-columns: auto 1fr;
     grid-template-rows: auto 1fr auto;
     grid-gap: 1em;
+    align-items: flex-start;
   }
 
   #holder {
@@ -84,13 +153,14 @@ p {
   top: 0;
   bottom: 0;
   display: grid;
-  grid-template-areas: "top top top"
-                       "bottom-left-1 mid bottom-right-1"
-                       "bottom-left-2 mid bottom-right-2"
-                       "bottom-left-3 mid bottom-right-3"
-                       "bottom-left-4 mid bottom-right-4"
-                       "bottom-left-5 mid bottom-right-5"
-                       "bottom-left-6 mid bottom-right-6";
+  grid-template-areas:
+    "top top top"
+    "bottom-left-1 mid bottom-right-1"
+    "bottom-left-2 mid bottom-right-2"
+    "bottom-left-3 mid bottom-right-3"
+    "bottom-left-4 mid bottom-right-4"
+    "bottom-left-5 mid bottom-right-5"
+    "bottom-left-6 mid bottom-right-6";
   grid-template-columns: auto 1fr auto;
   grid-template-rows: 1fr auto auto auto auto auto auto;
   grid-row-gap: 0.25em;
@@ -122,10 +192,10 @@ canvas {
 }
 
 .matrix-value {
-  border: 1px solid;
+  border: none;
   border-radius: 3px;
   text-align: center;
-  color: black;
+  color: currentColor;
   text-align: center;
 }
 
@@ -136,6 +206,36 @@ canvas {
   grid-gap: 0.15em;
   justify-content: center;
   font-size: 0.75em;
+  position: relative;
+  border-left: var(--border-width) solid currentColor;
+  border-right: var(--border-width) solid currentColor;
+  --border-width: 4px;
+  --horizontal-border-percentage: 15%;
+}
+
+.mat::before,
+.mat::after {
+  content: "";
+  position: absolute;
+  height: var(--border-width);
+  width: calc(100% + 2 * var(--border-width));
+  left: calc(-1 * var(--border-width));
+  background-image: linear-gradient(
+    to right,
+    currentColor 0%,
+    currentColor var(--horizontal-border-percentage),
+    transparent var(--horizontal-border-percentage),
+    transparent calc(100% - var(--horizontal-border-percentage)),
+    currentColor calc(100% - var(--horizontal-border-percentage))
+  );
+}
+
+.mat::before {
+  top: calc(-1 * var(--border-width));
+}
+
+.mat::after {
+  bottom: calc(-1 * var(--border-width));
 }
 
 #matrices {
@@ -143,6 +243,19 @@ canvas {
   text-align: center;
   grid: auto 1fr auto / repeat(3, 1fr);
   grid-gap: 0.25em;
+  font-size: 2em;
+}
+
+@media (max-width: 524px) {
+  #matrices {
+    font-size: 1.5em;
+  }
+}
+
+@media (max-width: 400px) {
+  #matrices {
+    font-size: 1em;
+  }
 }
 
 #matrices.single-matrix {
@@ -156,6 +269,7 @@ canvas {
 #operation-params {
   grid-column: 1 / span 3;
   text-align: left;
+  margin-top: 1em;
 }
 
 #matrices.single-matrix #operation-params {
@@ -183,15 +297,20 @@ canvas {
   transition-timing-function: ease-out;
   transition-duration: var(--highlight-duration);
   transform: scale(1);
-  outline: 0px solid yellow;
+  outline: 0px solid #427343;
   z-index: 0;
+  background-color: #aeeab0;
 }
 
 .matrix-value.just-changed,
 .parameter.just-changed {
   transform: scale(1.2);
-  outline: 0.2em solid yellow;
+  outline: 0.2em solid #427343;
   z-index: 10;
+}
+
+.matrix-value:disabled {
+  background-color: transparent;
 }
 
 input[type="number"]::-webkit-outer-spin-button,
@@ -206,4 +325,9 @@ input[type="number"] {
 
 button {
   cursor: pointer;
+}
+
+footer {
+  background: #cbe0ff;
+  color: black;
 }
