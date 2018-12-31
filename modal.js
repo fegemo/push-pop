@@ -1,3 +1,27 @@
+import { matrixDimension } from "./config.js";
+import binder from "./binder.js";
+
+function dd(e) {
+  //Note that this doesn't honour tab-indexes
+  e.preventDefault();
+
+  //Isolate the node that we're after
+  const currentNode = e.target;
+
+  //find all tab-able elements
+  const allElements = document.querySelectorAll(
+    "input, button, a, area, object, select, textarea, [contenteditable]"
+  );
+
+  //Find the current tab index.
+  const currentIndex = Array.from(allElements).findIndex(el =>
+    currentNode.isEqualNode(el)
+  );
+
+  //focus the following element
+  allElements[currentIndex + 1].focus();
+}
+
 function clearModalMatrices(currentMatrix) {
   const modalMatrixEl = document.querySelector("#modal-matrix");
   const currentMatrixEl = modalMatrixEl.querySelector("#mat-left");
@@ -30,8 +54,8 @@ function clearModalMatrices(currentMatrix) {
     .forEach(el => el.setAttribute("disabled", true));
 }
 
-function openMatrixModal(operation, currentMatrix) {
-  isModalOpen = true;
+export default function openMatrixModal(operation, currentMatrix) {
+  document.body.classList.add("modal-open");
   const modalMatrixEl = document.querySelector("#modal-matrix");
   const currentMatrixEl = modalMatrixEl.querySelector("#mat-left");
   const generatedMatrixEl = modalMatrixEl.querySelector("#mat-top");
@@ -110,18 +134,23 @@ function openMatrixModal(operation, currentMatrix) {
     let matrix = currentMatrix;
 
     const modalOkEl = modalMatrixEl.querySelector("#matrix-ok");
-    const modalCloseEls = [...modalMatrixEl.querySelectorAll(".close"), ...modalMatrixEl.querySelectorAll(".modal-mask")];
+    const modalCloseEls = [
+      ...modalMatrixEl.querySelectorAll(".close"),
+      ...modalMatrixEl.querySelectorAll(".modal-mask")
+    ];
 
     let closeModal = e => {
       // removes the click handler, as it is
       e.currentTarget.removeEventListener("click", okHandler);
-      modalCloseEls.forEach(el => el.removeEventListener("click", closeHandler));
+      modalCloseEls.forEach(el =>
+        el.removeEventListener("click", closeHandler)
+      );
 
       // triggers the closing animation
       modalMatrixEl.classList.remove("in");
       setTimeout(() => {
         modalMatrixEl.style.display = "none";
-        isModalOpen = false;
+        document.body.classList.remove("modal-open");
       }, 500);
     };
 
