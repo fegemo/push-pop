@@ -8,12 +8,16 @@ import {
   maxMatrices
 } from "./config.js";
 
+const isModalOpen = () => {
+  return document.body.classList.contains("modal-open");
+};
+
 class Button {
   constructor(p5, text, region) {
     this.p5 = p5;
     this.button = p5.createButton(text);
     this.button.style("grid-area", region);
-    this.button.mousePressed(() => {
+    this.button.mouseClicked(() => {
       this.showExplanation();
       this.execute();
     });
@@ -36,10 +40,12 @@ class Button {
   }
 
   hideExplanation() {
-    const explanationEl = document.querySelector("#explanation");
-    explanationEl.classList.add("invisible");
-    explanationEl.onTransitionEnd = () =>
-      explanationEl.setAttribute("hidden", true);
+    if (!isModalOpen()) {
+      const explanationEl = document.querySelector("#explanation");
+      explanationEl.classList.add("invisible");
+      explanationEl.onTransitionEnd = () =>
+        explanationEl.setAttribute("hidden", true);
+    }
   }
 
   execute() {
