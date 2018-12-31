@@ -6,11 +6,28 @@ const currentMatrixEl = modalMatrixEl.querySelector("#mat-left");
 const generatedMatrixEl = modalMatrixEl.querySelector("#mat-top");
 const resultingMatrixEl = modalMatrixEl.querySelector("#mat-right");
 
+const autoSelectContents = e => {
+  const el = e.currentTarget;
+  // for desktops
+  el.select();
+
+  // for mobile
+  if ("ontouchstart" in window) {
+    try {
+      setTimeout(() => el.setSelectionRange(0, el.value.length), 1);
+    } catch (err) {
+      // simply ignores the error... some browsers do not accept
+      // setSelectionRange on input[type="number"]s
+    }
+  }
+};
+
 const keyPress = e => {
   const key = e.keyCode || e.which;
 
   // checks for 'Enter'
-  if (key === 13) {
+  const ENTER = 13;
+  if (key === ENTER) {
     const focusedEl = document.activeElement;
 
     // checks if the focus within an element which is inside the modal
@@ -63,7 +80,12 @@ function clearModalMatrices(currentMatrix) {
   // disables all inputs
   modalMatrixEl
     .querySelectorAll(".matrix-value")
-    .forEach(el => el.setAttribute("disabled", true));
+    .forEach(el => {
+      el.setAttribute("disabled", true);
+      el.removeEventListener("focus", autoSelectContents);
+    });
+
+  const enabledInputEls = Array.from(modalMatrixEl.querySelectorAll("input.matrix-value:not(:disabled), input.parameter"));
 }
 
 export default function openMatrixModal(operation, currentMatrix) {
@@ -118,6 +140,10 @@ export default function openMatrixModal(operation, currentMatrix) {
     generatedMatrixEl.querySelector(".mat"),
     modalMatrixEl.querySelector("#operation-params")
   );
+
+  // makes input auto select all text when focused
+  const enabledInputEls = Array.from(modalMatrixEl.querySelectorAll("input.matrix-value:not(:disabled), input.parameter"));
+  enabledInputEls.forEach(el => el.addEventListener("focus", autoSelectContents));
 
   // effectively shows the modal
   modalMatrixEl.style.display = "block";
