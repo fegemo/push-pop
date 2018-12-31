@@ -19,7 +19,8 @@ const highlightElements = (elements, changedElement, changeListener) => {
       }
       el.classList.add("just-changed");
 
-      el.dataset.changeListener = changeListener;
+      el.customEvents = el.customEvents || {};
+      el.customEvents.changeListener = changeListener;
       el.dataset.transitionTimeoutId = setTimeout(() => {
         el.classList.remove("just-changed");
         delete el.dataset.transitionTimeoutId;
@@ -29,7 +30,7 @@ const highlightElements = (elements, changedElement, changeListener) => {
 
 const binder = {
   watchAndTransform: (callback, transformer, ...elements) => {
-    const changeListener = document.addEventListener("input", e => {
+    const handler = e => {
       const changedElement = e.target;
       const newValue = changedElement.value;
 
@@ -39,13 +40,17 @@ const binder = {
         // calls some callback to do something
         callback();
         // higlights the changed elements
-        highlightElements(elements, changedElement, changeListener);
+        highlightElements(elements, changedElement, handler);
       }
-    });
+    };
+
+    ["input", "change"].forEach(type =>
+      document.addEventListener(type, handler)
+    );
   },
 
   bind: (callback, ...elements) => {
-    const changeListener = document.addEventListener("input", e => {
+    const handler = e => {
       const changedElement = e.target;
 
       if (elements.includes(changedElement)) {
@@ -56,17 +61,27 @@ const binder = {
         // calls some callback to do something
         callback();
         // higlights the changed elements
-        highlightElements(elements, changedElement, changeListener);
+        highlightElements(elements, changedElement, handler);
       }
-    });
+    };
+
+    ["input", "change"].forEach(type =>
+      document.addEventListener(type, handler)
+    );
   },
 
   unbind: (...elements) => {
     elements.forEach(el => {
-      const changeListener = el.dataset.changeListener;
-      delete el.dataset.changeListener;
+      if (typeof el.customEvents !== "object") {
+        return;
+      }
+
+      const changeListener = el.customEvents.changeListener;
+      delete el.customEvents.changeListener;
       if (changeListener && changeListener !== "undefined") {
-        document.removeEventListener("input", changeListener);
+        ["input", "change"].forEach(type =>
+          document.removeEventListener(type, changeListener)
+        );
       }
     });
   }

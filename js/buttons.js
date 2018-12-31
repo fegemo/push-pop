@@ -143,13 +143,16 @@ export class LoadMatrixButton extends Button {
   }
 
   onParameterChanged() {
+    const modalMatrixEl = document.querySelector("#modal-matrix");
+    const generatedMatrixEl = modalMatrixEl.querySelector("#mat-top");
+    const resultingMatrixEl = modalMatrixEl.querySelector("#mat-right");
     // assembles a 1d array of the generated matrix
     const generated = Array.from(
       generatedMatrixEl.querySelectorAll(".matrix-value")
     ).map(el => parseFloat(el.value.trim() || "0"));
     // writes the 1d array result back into the resulting matrix
     const resultingEls = resultingMatrixEl.querySelectorAll(".matrix-value");
-    resultingEls.forEach((el, i) => (el.value = resultsArray[i]));
+    resultingEls.forEach((el, i) => (el.value = generated[i]));
   }
 
   getParams() {

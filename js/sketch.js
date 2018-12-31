@@ -10,6 +10,7 @@ import {
 import Matrix from "./matrix.js";
 import Cloud from "./cloud.js";
 import { dimensions, matrixDimension, matrixStack } from "./config.js";
+import dragger from "./number-dragger.js";
 
 new p5(p5 => {
   let clouds = [];
@@ -59,7 +60,8 @@ new p5(p5 => {
       const desiredAspectRatio = dimensions.width / dimensions.height;
       canvas = p5.createCanvas(
         p5.windowWidth - dimensions.minHorizontalMargin * 2,
-        (p5.windowWidth - dimensions.minHorizontalMargin * 2) * desiredAspectRatio
+        (p5.windowWidth - dimensions.minHorizontalMargin * 2) *
+          desiredAspectRatio
       );
       dimensions.scaleFactor =
         (p5.windowWidth - dimensions.minHorizontalMargin * 2) /
@@ -95,6 +97,13 @@ new p5(p5 => {
       new LoadMatrixButton(p5, "bottom-left-5"),
       new MultMatrixButton(p5, "glMultMatrix(...)", "bottom-left-6")
     ];
+
+    const modalMatrixEl = document.querySelector("#modal-matrix");
+    dragger.bind(
+      modalMatrixEl,
+      ".matrix-value:not(:disabled), .parameter",
+      0.1
+    );
   };
 
   p5.windowResized = () => {

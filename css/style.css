@@ -300,6 +300,7 @@ canvas {
   outline: 0px solid #427343;
   z-index: 0;
   background-color: #aeeab0;
+  cursor: col-resize;
 }
 
 .matrix-value.just-changed,
