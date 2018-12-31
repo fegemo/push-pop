@@ -58,8 +58,8 @@ new p5(p5 => {
     if (p5.windowWidth >= 320 && p5.windowWidth <= dimensions.width) {
       const desiredAspectRatio = dimensions.width / dimensions.height;
       canvas = p5.createCanvas(
-        windowWidth - dimensions.minHorizontalMargin * 2,
-        (windowWidth - dimensions.minHorizontalMargin * 2) * desiredAspectRatio
+        p5.windowWidth - dimensions.minHorizontalMargin * 2,
+        (p5.windowWidth - dimensions.minHorizontalMargin * 2) * desiredAspectRatio
       );
       dimensions.scaleFactor =
         (p5.windowWidth - dimensions.minHorizontalMargin * 2) /
@@ -100,7 +100,7 @@ new p5(p5 => {
   p5.windowResized = () => {
     if (p5.windowWidth >= 320 && p5.windowWidth <= dimensions.width) {
       const desiredAspectRatio = dimensions.width / dimensions.height;
-      resizeCanvas(
+      p5.resizeCanvas(
         p5.windowWidth - dimensions.minHorizontalMargin * 2,
         (p5.windowWidth - dimensions.minHorizontalMargin * 2) /
           desiredAspectRatio,

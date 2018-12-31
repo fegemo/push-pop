@@ -1,33 +1,45 @@
 import { matrixDimension } from "./config.js";
 import binder from "./binder.js";
 
-function dd(e) {
-  //Note that this doesn't honour tab-indexes
-  e.preventDefault();
+const modalMatrixEl = document.querySelector("#modal-matrix");
+const currentMatrixEl = modalMatrixEl.querySelector("#mat-left");
+const generatedMatrixEl = modalMatrixEl.querySelector("#mat-top");
+const resultingMatrixEl = modalMatrixEl.querySelector("#mat-right");
 
-  //Isolate the node that we're after
-  const currentNode = e.target;
+const keyPress = e => {
+  const key = e.keyCode || e.which;
 
-  //find all tab-able elements
-  const allElements = document.querySelectorAll(
-    "input, button, a, area, object, select, textarea, [contenteditable]"
+  // checks for 'Enter'
+  if (key === 13) {
+    const focusedEl = document.activeElement;
+
+    // checks if the focus within an element which is inside the modal
+    if (modalMatrixEl.contains(focusedEl)) {
+      // if it's a button or link, 'Enter' should not be prevented
+      if (!["button", "a"].includes(focusedEl.tagName.toLowerCase())) {
+        e.preventDefault();
+        simulateTab(focusedEl);
+      }
+    }
+  }
+};
+
+function simulateTab(targetEl) {
+  //finds all tab-able elements inside the modal
+  const focusableEls = modalMatrixEl.querySelectorAll(
+    "input:not(:disabled), button, a"
   );
 
-  //Find the current tab index.
-  const currentIndex = Array.from(allElements).findIndex(el =>
-    currentNode.isEqualNode(el)
+  // finds the current tab index
+  const currentIndex = Array.from(focusableEls).findIndex(
+    el => targetEl === el
   );
 
-  //focus the following element
-  allElements[currentIndex + 1].focus();
+  // focuses the following element
+  focusableEls[currentIndex + 1].focus();
 }
 
 function clearModalMatrices(currentMatrix) {
-  const modalMatrixEl = document.querySelector("#modal-matrix");
-  const currentMatrixEl = modalMatrixEl.querySelector("#mat-left");
-  const generatedMatrixEl = modalMatrixEl.querySelector("#mat-top");
-  const resultingMatrixEl = modalMatrixEl.querySelector("#mat-right");
-
   let currents = Array.from(currentMatrixEl.querySelectorAll(".matrix-value"));
   let generated = Array.from(
     generatedMatrixEl.querySelectorAll(".matrix-value")
@@ -56,10 +68,7 @@ function clearModalMatrices(currentMatrix) {
 
 export default function openMatrixModal(operation, currentMatrix) {
   document.body.classList.add("modal-open");
-  const modalMatrixEl = document.querySelector("#modal-matrix");
-  const currentMatrixEl = modalMatrixEl.querySelector("#mat-left");
-  const generatedMatrixEl = modalMatrixEl.querySelector("#mat-top");
-  const resultingMatrixEl = modalMatrixEl.querySelector("#mat-right");
+  document.body.addEventListener("keydown", keyPress);
 
   // resets the modal to its defaults
   clearModalMatrices(currentMatrix);
@@ -142,6 +151,7 @@ export default function openMatrixModal(operation, currentMatrix) {
     let closeModal = e => {
       // removes the click handler, as it is
       e.currentTarget.removeEventListener("click", okHandler);
+      document.body.removeEventListener("keydown", keyPress);
       modalCloseEls.forEach(el =>
         el.removeEventListener("click", closeHandler)
       );

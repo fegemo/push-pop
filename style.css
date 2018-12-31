@@ -313,6 +313,11 @@ canvas {
   background-color: transparent;
 }
 
+#matrix-ok:focus,
+.close:focus {
+  outline: 3px solid yellow;
+}
+
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
