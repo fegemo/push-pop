@@ -78,14 +78,16 @@ function clearModalMatrices(currentMatrix) {
   binder.unbind(...currents, ...generated, ...resulting, ...parameters);
 
   // disables all inputs
-  modalMatrixEl
-    .querySelectorAll(".matrix-value")
-    .forEach(el => {
-      el.setAttribute("disabled", true);
-      el.removeEventListener("focus", autoSelectContents);
-    });
+  modalMatrixEl.querySelectorAll(".matrix-value").forEach(el => {
+    el.setAttribute("disabled", true);
+    el.removeEventListener("focus", autoSelectContents);
+  });
 
-  const enabledInputEls = Array.from(modalMatrixEl.querySelectorAll("input.matrix-value:not(:disabled), input.parameter"));
+  const enabledInputEls = Array.from(
+    modalMatrixEl.querySelectorAll(
+      "input.matrix-value:not(:disabled), input.parameter"
+    )
+  );
 }
 
 export default function openMatrixModal(operation, currentMatrix) {
@@ -118,6 +120,11 @@ export default function openMatrixModal(operation, currentMatrix) {
         params.showMiddleMatrix &&
         !params.showRightMatrix
     );
+  const matrixWithResultsEl = modalMatrixEl
+    .querySelector("#matrices")
+    .classList.contains("single-matrix")
+    ? generatedMatrixEl
+    : resultingMatrixEl;
 
   // configures the parameter and OpenGL commands section of the modal
   const paramsEl = modalMatrixEl.querySelector("#operation-params");
@@ -142,8 +149,14 @@ export default function openMatrixModal(operation, currentMatrix) {
   );
 
   // makes input auto select all text when focused
-  const enabledInputEls = Array.from(modalMatrixEl.querySelectorAll("input.matrix-value:not(:disabled), input.parameter"));
-  enabledInputEls.forEach(el => el.addEventListener("focus", autoSelectContents));
+  const enabledInputEls = Array.from(
+    modalMatrixEl.querySelectorAll(
+      "input.matrix-value:not(:disabled), input.parameter"
+    )
+  );
+  enabledInputEls.forEach(el =>
+    el.addEventListener("focus", autoSelectContents)
+  );
 
   // effectively shows the modal
   modalMatrixEl.style.display = "block";
@@ -193,7 +206,7 @@ export default function openMatrixModal(operation, currentMatrix) {
     const okHandler = e => {
       // sets the value of the currentMatrix as the resulting one
       matrix = Array.from(
-        modalMatrixEl.querySelectorAll("#mat-right .matrix-value")
+        matrixWithResultsEl.querySelectorAll(".matrix-value")
       ).map(el => parseFloat(el.value));
 
       // and resolves the promise with the result
