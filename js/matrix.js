@@ -1,4 +1,5 @@
 import { dimensions } from "./config.js";
+import { roundTo } from "./number-formatter.js";
 
 export default class Matrix {
   constructor(p5, numbers, bottomLimit) {
@@ -88,7 +89,8 @@ export default class Matrix {
       for (let j = 0; j < this.size; j++) {
         const posX = x + Matrix.characterSpacing * (j - (this.size - 1) / 2);
         const posY = y + Matrix.characterSpacing * (i - (this.size - 1) / 2);
-        this.p5.text(this.numbers[i + j * this.size], posX, posY);
+        const number = this.numbers[i + j * this.size];
+        this.p5.text(roundTo(number, 2), posX, posY);
       }
     }
     this.p5.textAlign(this.p5.LEFT);
