@@ -11,6 +11,7 @@ import Matrix from "./matrix.js";
 import Cloud from "./cloud.js";
 import { dimensions, matrixDimension, matrixStack } from "./config.js";
 import dragger from "./number-dragger.js";
+import resizer from "./input-autosizer.js";
 
 new p5(p5 => {
   let clouds = [];
@@ -103,6 +104,10 @@ new p5(p5 => {
       modalMatrixEl,
       ".matrix-value:not(:disabled), .parameter",
       0.1
+    );
+    resizer.bind(
+      modalMatrixEl,
+      ".parameter"
     );
   };
 

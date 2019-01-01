@@ -1,3 +1,5 @@
+import delegate from "./delegator.js";
+
 const draggedInput = {
   el: null,
   x: null,
@@ -50,16 +52,6 @@ const startDragging = e => {
   draggedInput.startValue = parseFloat(e.target.value);
 };
 
-const delegate = (targetSelector, callback) => {
-  return e => {
-    const delegatorEl = e.currentTarget;
-    const validTargetTriggered = e.target.matches(targetSelector);
-    if (validTargetTriggered) {
-      callback(e);
-    }
-  };
-};
-
 let delegated = null;
 
 const dragger = {
@@ -71,7 +63,7 @@ const dragger = {
     window.addEventListener("mouseup", mouseUp);
   },
 
-  unbind: selector => {
+  unbind: el => {
     if (delegated) {
       el.removeEventListener("mousedown", delegated);
     }

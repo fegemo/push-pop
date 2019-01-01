@@ -284,7 +284,9 @@ canvas {
 }
 
 .parameter {
-  box-sizing: border-box;
+  box-sizing: content-box;
+  padding-left: 0.25em;
+  padding-right: 0.25em; 
   width: 2em;
   border-radius: 3px;
   border-width: 0;
