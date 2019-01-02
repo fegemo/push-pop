@@ -12,6 +12,7 @@ import Cloud from "./cloud.js";
 import { dimensions, matrixDimension, matrixStack } from "./config.js";
 import dragger from "./number-dragger.js";
 import resizer from "./input-autosizer.js";
+import sound from "./sound.js";
 
 new p5(p5 => {
   let clouds = [];
@@ -105,9 +106,9 @@ new p5(p5 => {
       ".matrix-value:not(:disabled), .parameter",
       0.1
     );
-    resizer.bind(
-      modalMatrixEl,
-      ".parameter"
+    resizer.bind(modalMatrixEl, ".parameter");
+    sound.preload(
+      ["hover.mp3", "pop.mp3", "push-end.mp3", "falling.mp3"].map(n => "../sound/" + n)
     );
   };
 

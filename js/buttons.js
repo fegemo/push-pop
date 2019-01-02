@@ -7,6 +7,7 @@ import {
   matrixStack,
   maxMatrices
 } from "./config.js";
+import sound from "./sound.js";
 
 const isModalOpen = () => {
   return document.body.classList.contains("modal-open");
@@ -37,6 +38,7 @@ class Button {
     explanationEl.removeAttribute("hidden");
     explanationEl.classList.remove("invisible");
     explanationEl.onTransitionEnd = null;
+    sound.play("hover.mp3", 0, 0.25);
   }
 
   hideExplanation() {
@@ -69,14 +71,19 @@ export class PushMatrixButton extends Button {
   execute() {
     if (matrixStack.length < maxMatrices) {
       const topMatrix = matrixStack[matrixStack.length - 1];
+      const soundBegin = (matrixStack.length - 1) / maxMatrices;
+      sound.play("falling.mp3", soundBegin, 0.5);
       if (topMatrix.bot) {
-        matrixStack.push(
-          new Matrix(
-            this.p5,
-            topMatrix.numbers.slice(),
-            topMatrix.pos.y - Matrix.size(4) * 0.9
-          )
+        const clonedMatrix = new Matrix(
+          this.p5,
+          topMatrix.numbers.slice(),
+          topMatrix.pos.y - Matrix.size(4) * 0.9
         );
+        clonedMatrix.registerDropped(() => {
+          sound.stop("falling.mp3");
+          sound.play("push-end.mp3", 0, 0.15);
+        });
+        matrixStack.push(clonedMatrix);
       }
     }
   }
@@ -99,6 +106,7 @@ export class PopMatrixButton extends Button {
   execute() {
     if (matrixStack.length > 1) {
       matrixStack.splice(matrixStack.length - 1, 1);
+      sound.play("pop.mp3", 0, 0.15);
     }
   }
 

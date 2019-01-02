@@ -103,9 +103,18 @@ export default class Matrix {
 
       return true;
     } else {
+      if (!this.bot) {
+        if (this.droppedCallback) {
+          this.droppedCallback();
+        }
+      }
       this.bot = true;
       this.pos.y = this.bottomLimit - 8;
       return false;
     }
+  }
+
+  registerDropped(callback) {
+    this.droppedCallback = callback;
   }
 }
