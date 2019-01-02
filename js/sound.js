@@ -1,9 +1,21 @@
+import hasUserInteractedWithPage from "./interaction-checker.js";
+
 class Sound {
   constructor(name) {
     this.name = name;
     try {
-      this.audio = new Audio(name);
+      this.audio = new Audio();
+      this.audio.src = name;
+      this.audio.preload = "auto";
       this.audio.addEventListener("canplaythrough", () => (this.ready = true));
+      this.audio.volume = 0;
+
+      const playPromise = this.audio.play();
+
+      if (playPromise && playPromise.catch) {
+        // simply ignores the error
+        playPromise.catch(() => {});
+      }
     } catch (err) {
       console.error(`Could not load audio with path "${name}". Reason: ${err}`);
     }
@@ -14,7 +26,14 @@ class Sound {
       timestamp = Math.min(Math.max(0, timestamp), 1);
       this.audio.currentTime = timestamp * this.audio.duration;
       this.audio.volume = volume;
-      this.audio.play();
+      if (hasUserInteractedWithPage()) {
+        const playPromise = this.audio.play();
+
+        if (playPromise && playPromise.catch) {
+          // simply ignores the error
+          playPromise.catch(() => {});
+        }
+      }
     }
   }
 

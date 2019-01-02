@@ -13,12 +13,14 @@ const autoSelectContents = e => {
 
   // for mobile
   if ("ontouchstart" in window) {
-    try {
-      setTimeout(() => el.setSelectionRange(0, el.value.length), 1);
-    } catch (err) {
-      // simply ignores the error... some browsers do not accept
-      // setSelectionRange on input[type="number"]s
-    }
+    setTimeout(() => {
+      try {
+        el.setSelectionRange(0, el.value.length);
+      } catch (err) {
+        // simply ignores the error... some browsers do not accept
+        // setSelectionRange on input[type="number"]s
+      }
+    }, 1);
   }
 };
 
@@ -49,7 +51,7 @@ const popStater = closer => {
   };
 };
 
-function simulateTab(targetEl) {
+const simulateTab = targetEl => {
   //finds all tab-able elements inside the modal
   const focusableEls = modalMatrixEl.querySelectorAll(
     "input:not(:disabled), button, a"
@@ -62,7 +64,7 @@ function simulateTab(targetEl) {
 
   // focuses the following element
   focusableEls[currentIndex + 1].focus();
-}
+};
 
 function clearModalMatrices(currentMatrix) {
   let currents = Array.from(currentMatrixEl.querySelectorAll(".matrix-value"));
@@ -101,7 +103,7 @@ function clearModalMatrices(currentMatrix) {
 export default function openMatrixModal(operation, currentMatrix) {
   document.body.classList.add("modal-open");
   document.body.addEventListener("keydown", keyPress);
-  history.pushState({}, null, "#matrix-modal");
+  history.pushState({}, null, "");
 
   // resets the modal to its defaults
   clearModalMatrices(currentMatrix);
@@ -200,7 +202,8 @@ export default function openMatrixModal(operation, currentMatrix) {
       // removes the click handler, as it is
       e.currentTarget.removeEventListener("click", okHandler);
       document.body.removeEventListener("keydown", keyPress);
-      window.removeEventListener("popstate", popStated);
+      history.go(-1);
+
       modalCloseEls.forEach(el =>
         el.removeEventListener("click", closeHandler)
       );
