@@ -41,6 +41,14 @@ const keyPress = e => {
   }
 };
 
+const popStater = closer => {
+  return e => {
+    closer({
+      currentTarget: window
+    });
+  };
+};
+
 function simulateTab(targetEl) {
   //finds all tab-able elements inside the modal
   const focusableEls = modalMatrixEl.querySelectorAll(
@@ -93,6 +101,7 @@ function clearModalMatrices(currentMatrix) {
 export default function openMatrixModal(operation, currentMatrix) {
   document.body.classList.add("modal-open");
   document.body.addEventListener("keydown", keyPress);
+  history.pushState({}, null, "#matrix-modal");
 
   // resets the modal to its defaults
   clearModalMatrices(currentMatrix);
@@ -191,6 +200,7 @@ export default function openMatrixModal(operation, currentMatrix) {
       // removes the click handler, as it is
       e.currentTarget.removeEventListener("click", okHandler);
       document.body.removeEventListener("keydown", keyPress);
+      window.removeEventListener("popstate", popStated);
       modalCloseEls.forEach(el =>
         el.removeEventListener("click", closeHandler)
       );
@@ -222,6 +232,8 @@ export default function openMatrixModal(operation, currentMatrix) {
       reject();
     };
 
+    const popStated = popStater(closeHandler);
+    window.addEventListener("popstate", popStated);
     modalOkEl.addEventListener("click", okHandler);
     modalCloseEls.forEach(el => el.addEventListener("click", closeHandler));
   });
