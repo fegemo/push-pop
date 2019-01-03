@@ -13,6 +13,7 @@ import { dimensions, matrixDimension, matrixStack } from "./config.js";
 import dragger from "./number-dragger.js";
 import resizer from "./input-autosizer.js";
 import sound from "./sound.js";
+import { bootstrapi18n, t } from "./i18n.js";
 
 new p5(p5 => {
   let clouds = [];
@@ -41,7 +42,7 @@ new p5(p5 => {
     // draws the "current" word next to the top-most matrix
     const topMatrix = matrixStack[matrixStack.length - 1];
     p5.text(
-      "Atual",
+      t("current"),
       topMatrix.pos.x + Matrix.size(matrixDimension) * 0.5,
       topMatrix.pos.y
     );
@@ -115,6 +116,7 @@ new p5(p5 => {
         n => "../sound/" + n
       )
     );
+    bootstrapi18n("[data-t]");
   };
 
   p5.windowResized = () => {

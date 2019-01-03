@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
   <link rel="mask-icon" href="imgs/safari-pinned-tab.svg" color="#5bbad5">
   <meta name="msapplication-TileColor" content="#00aba9">
   <meta name="theme-color" content="#586c61">
-  <title>Tutorial de matrizes OpenGL</title>
+  <title data-t="page-title">Tutorial de matrizes OpenGL</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Amatic+SC|Abel">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/modal.css">
@@ -19,7 +19,7 @@
 </head>
 <body>
   <header>
-    <h1>Tutorial de matrizes <strong>OpenGL</strong>!!</h1>
+    <h1 data-t="page-heading">Tutorial de matrizes <strong>OpenGL</strong>!!</h1>
   </header>
   <div id="container">
     <main id="holder">
@@ -27,18 +27,21 @@
         <div id="buttons-container"></div>
       </div>
     </main>
-    <p>
+    <p data-t="page-about">
       Esta explicação interativa tem o intuito de mostrar o funcionamento
       das funções de matrizes do OpenGL e como funcionam as pilhas de matrizes,
       além da composição de transformações.
     </p>
     <section id="explanation" class="invisible">
-      <h2 class="title">Referência</h2>
+      <h2 class="title"></h2>
       <p class="description"></p>
-      <p class="more-info"></p>
+      <p class="more-info">
+        <span class="more-info-text"></span>
+        <a href="#" class="more-info-link" target="_blank"></a>
+      </p>
     </section>
     <footer>
-      <p>
+      <p data-t="footer-description">
         Esta foi uma iniciativa do aluno <a href="mailto:higorflopes@gmail.com">Higor Fischer</a>
         e do professor <a href="https://github.com/fegemo/">Flávio Coutinho</a>.
       </p>
@@ -50,12 +53,12 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Descreva a matriz</h4>
+          <h4 class="modal-title" data-t="modal-title">Descreva a matriz</h4>
         </div>
         <div class="modal-body" id="matrices">
-          <h5 id="current-matrix">Matriz corrente</h5>
-          <h5 id="generated-matrix">Matriz gerada</h5>
-          <h5 id="resulting-matrix">Matriz resultante</h5>
+          <h5 id="current-matrix" data-t="current-matrix">Matriz corrente</h5>
+          <h5 id="generated-matrix" data-t="generated-matrix">Matriz gerada</h5>
+          <h5 id="resulting-matrix" data-t="resulting-matrix">Matriz resultante</h5>
           <div class="matrix-description" id="mat-left">
             <div class="mat">
               <input value="1" class="matrix-value" type="number" placeholder="0" disabled>
@@ -121,7 +124,7 @@
           <div id="operation-params"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="matrix-ok">Ok</button>
+          <button type="button" class="btn btn-primary" id="matrix-ok" data-t="modal-ok">Ok</button>
         </div>
       </div>
     </div>

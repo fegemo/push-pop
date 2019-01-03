@@ -8,6 +8,7 @@ import {
   maxMatrices
 } from "./config.js";
 import sound from "./sound.js";
+import { t } from "./i18n.js";
 
 const isModalOpen = () => {
   return document.body.classList.contains("modal-open");
@@ -33,8 +34,10 @@ class Button {
     explanationEl.querySelector(".title").innerHTML = title;
     explanationEl.querySelector(".description").innerHTML = description;
     explanationEl.querySelector(
-      ".more-info"
-    ).innerHTML = `Mais informações: <a href="${moreInfo}" target="_blank">${moreInfo}</a>`;
+      ".more-info-text"
+    ).innerHTML = t("explanation-more-info");
+    explanationEl.querySelector(".more-info-link").href = moreInfo;
+    explanationEl.querySelector(".more-info-link").innerHTML = moreInfo;
     explanationEl.removeAttribute("hidden");
     explanationEl.classList.remove("invisible");
     explanationEl.onTransitionEnd = null;
@@ -55,15 +58,15 @@ class Button {
   }
 
   execute() {
-    alert("Ainda não implementado");
+    alert(t("not-yet-implemented"));
   }
 
   configureBinding(matricesEl) {
-    alert("Ainda não implementado");
+    alert(t("not-yet-implemented"));
   }
 
   getExplanation() {
-    alert("Ainda não implementado");
+    alert(t("not-yet-implemented"));
   }
 }
 
@@ -95,8 +98,7 @@ export class PushMatrixButton extends Button {
   getExplanation() {
     return {
       title: "glPushMatrix();",
-      description:
-        "Clona a matriz que está no topo da pilha corrente e a empilha",
+      description: t("explanation-push"),
       moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glPushMatrix.html"
     };
   }
@@ -117,8 +119,7 @@ export class PopMatrixButton extends Button {
   getExplanation() {
     return {
       title: "glPopMatrix();",
-      description:
-        "Remove a matriz que está no topo da pilha corrente, voltando com a matriz anterior",
+      description: t("explanation-pop"),
       moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glPopMatrix.html"
     };
   }
@@ -183,8 +184,7 @@ export class LoadMatrixButton extends Button {
   getExplanation() {
     return {
       title: "glLoadMatrix(float*);",
-      description:
-        "Carrega o array de 16 <code>floats</code> passado como parâmetro na matriz que está no topo da pilha de matrizes corrente",
+      description: t("explanation-load"),
       moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glLoadMatrix.html"
     };
   }
@@ -283,8 +283,7 @@ export class MultMatrixButton extends Button {
   getExplanation() {
     return {
       title: "glMultMatrix(float*);",
-      description:
-        "Multiplica a matriz que está no topo da pilha de matrizes corrente por uma matriz formada pelo array de 16 <code>floats</code> passado como parâmetro",
+      description: t("explanation-mult"),
       moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glMultMatrix.html"
     };
   }
@@ -305,8 +304,7 @@ export class TranslateButton extends MultMatrixButton {
   getExplanation() {
     return {
       title: "glTranslatef(float x, float y, float z);",
-      description:
-        "Gera uma matriz de translação e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
+      description: t("explanation-translate"),
       moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glTranslate.html"
     };
   }
@@ -327,8 +325,7 @@ export class ScaleButton extends MultMatrixButton {
   getExplanation() {
     return {
       title: "glScalef(float x, float y, float z);",
-      description:
-        "Gera uma matriz de escala e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
+      description: t("explanation-scale"),
       moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glScale.html"
     };
   }
@@ -416,8 +413,7 @@ export class RotateButton extends MultMatrixButton {
   getExplanation() {
     return {
       title: "glRotatef(float alpha, float x, float y, float z);",
-      description:
-        "Gera uma matriz de rotação dada por um ângulo e um eixo de rotação e a multiplica à direita (<strong>pós multiplicação</strong>) da matriz que está no topo da pilha de matrizes corrente",
+      description: t("explanation-rotation"),
       moreInfo: "http://home.deec.uc.pt/~peixoto/eda/opengl/glRotate.html"
     };
   }
