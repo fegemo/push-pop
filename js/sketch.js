@@ -98,7 +98,10 @@ new p5(p5 => {
       new RotateButton(p5, "bottom-left-3"),
       new LoadMatrixButton(p5, "bottom-left-5"),
       new MultMatrixButton(p5, "glMultMatrix(...)", "bottom-left-6")
-    ];
+    ].map(b => {
+      b.setCanvasEl(canvas);
+      return b;
+    });
 
     const modalMatrixEl = document.querySelector("#modal-matrix");
     dragger.bind(
@@ -108,7 +111,9 @@ new p5(p5 => {
     );
     resizer.bind(modalMatrixEl, ".parameter");
     sound.preload(
-      ["hover.mp3", "pop.mp3", "push-end.mp3", "falling.mp3"].map(n => "../sound/" + n)
+      ["hover.mp3", "pop.mp3", "push-end.mp3", "falling.mp3"].map(
+        n => "../sound/" + n
+      )
     );
   };
 

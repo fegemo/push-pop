@@ -50,6 +50,10 @@ class Button {
     }
   }
 
+  setCanvasEl(canvasEl) {
+    this.canvasEl = canvasEl.elt;
+  }
+
   execute() {
     alert("Ainda não implementado");
   }
@@ -127,7 +131,7 @@ export class LoadMatrixButton extends Button {
 
   execute() {
     const topMatrix = matrixStack[matrixStack.length - 1];
-    openMatrixModal(this, topMatrix.numbers)
+    openMatrixModal(this, topMatrix)
       .then(numbers => (topMatrix.numbers = numbers))
       .catch(() => {});
   }
@@ -193,7 +197,7 @@ export class MultMatrixButton extends Button {
 
   execute() {
     const topMatrix = matrixStack[matrixStack.length - 1];
-    openMatrixModal(this, topMatrix.numbers)
+    openMatrixModal(this, topMatrix)
       .then(numbers => (topMatrix.numbers = numbers))
       .catch(() => {});
   }

@@ -43,8 +43,7 @@ button.close {
 
 
 .modal.fade .modal-dialog {
-  transform: translate(0, -25%);
-  transition: transform 0.3s ease-out;
+  transition: transform 200ms ease-out;
 }
 
 .fade {

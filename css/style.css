@@ -241,9 +241,75 @@ canvas {
 #matrices {
   display: grid;
   text-align: center;
-  grid: auto 1fr auto / repeat(3, 1fr);
+  grid: auto 1fr / 1fr;
   grid-gap: 0.25em;
   font-size: 2em;
+}
+
+#mat-top,
+#mat-right,
+#generated-matrix,
+#resulting-matrix,
+#operation-params {
+  display: none;
+}
+
+#mat-left {
+  justify-content: center;
+}
+
+.finished #mat-left {
+  justify-content: space-around;
+}
+
+.finished #matrices {
+  grid: auto 1fr auto / repeat(3, 1fr);
+}
+
+.finished #mat-top,
+.finished #mat-right {
+  display: flex;
+  transition: all 200ms ease-out;
+  transform: translateX(20%);
+  opacity: 0;
+}
+
+.finished #generated-matrix,
+.finished #resulting-matrix {
+  display: block;
+  transition: all 200ms ease-out;
+  transform: translateX(20%);
+  opacity: 0;
+}
+
+.finished #mat-top,
+.finished #generated-matrix {
+  transition-delay: .2s;
+}
+
+.finished #mat-right,
+.finished #resulting-matrix {
+  transition-delay: .4s;
+}
+
+.finished #operation-params {
+  display: block;
+  transition: all 200ms ease-out .6s;
+  transform: translateY(-20%);
+  opacity: 0;
+}
+
+.totally-finished #mat-top,
+.totally-finished #mat-right,
+.totally-finished #generated-matrix,
+.totally-finished #resulting-matrix {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.totally-finished #operation-params {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 @media (max-width: 524px) {
@@ -286,7 +352,7 @@ canvas {
 .parameter {
   box-sizing: content-box;
   padding-left: 0.25em;
-  padding-right: 0.25em; 
+  padding-right: 0.25em;
   width: 2em;
   border-radius: 3px;
   border-width: 0;

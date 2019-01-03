@@ -1,4 +1,4 @@
-import { matrixDimension } from "./config.js";
+import { dimensions, matrixDimension } from "./config.js";
 import binder from "./binder.js";
 
 const modalMatrixEl = document.querySelector("#modal-matrix");
@@ -66,7 +66,7 @@ const simulateTab = targetEl => {
   focusableEls[currentIndex + 1].focus();
 };
 
-function clearModalMatrices(currentMatrix) {
+const clearModalMatrices = currentMatrix => {
   let currents = Array.from(currentMatrixEl.querySelectorAll(".matrix-value"));
   let generated = Array.from(
     generatedMatrixEl.querySelectorAll(".matrix-value")
@@ -98,15 +98,61 @@ function clearModalMatrices(currentMatrix) {
       "input.matrix-value:not(:disabled), input.parameter"
     )
   );
-}
+};
 
-export default function openMatrixModal(operation, currentMatrix) {
+const openModalEffect = (operation, currentMatrix) => {
+  const canvasLimits = operation.canvasEl.getBoundingClientRect();
+  // debugger;
+  // get the position and dimension of the matrix in the canvas in the viewport
+  let canvasMatrixLimits = currentMatrix.limits();
+  canvasMatrixLimits = Object.keys(canvasMatrixLimits).reduce((prev, curr) => {
+    prev[curr] *= dimensions.scaleFactor;
+    return prev;
+  }, canvasMatrixLimits);
+  canvasMatrixLimits.top = canvasMatrixLimits.top + canvasLimits.top;
+
+
+  return new Promise(resolve => {
+    // get the target position and dimension of the matrix in the modal
+    const dialogEl = modalMatrixEl.querySelector(".modal-dialog");
+    modalMatrixEl.style.display = "block";
+    const vertical = canvasMatrixLimits.top / window.innerHeight;
+    dialogEl.style.transition = "none";
+    dialogEl.style.transformOrigin = `50% ${vertical*100}%`;
+    dialogEl.style.transform = `scale(${0.2})`;
+    const transitionDuration = 200;
+
+    setTimeout(() => {
+      modalMatrixEl.classList.add("in");
+      dialogEl.style.transition = `transform ${transitionDuration}ms ease-out`;
+
+      setTimeout(() => {
+        dialogEl.style.transform = `scale(1)`;
+        setTimeout(() => {
+          const modalTargetMatrixLimits = modalMatrixEl
+          .querySelector("#current-matrix")
+          .getBoundingClientRect();
+
+          modalMatrixEl.classList.add("finished");
+          setTimeout(() => {
+
+            modalMatrixEl.classList.add("totally-finished");
+            resolve();
+          }, transitionDuration);
+        }, transitionDuration);
+      }, 10);
+    }, 10);
+  });
+};
+
+export default async function openMatrixModal(operation, currentMatrix) {
+  const numbers = currentMatrix.numbers;
   document.body.classList.add("modal-open");
   document.body.addEventListener("keydown", keyPress);
   history.pushState({}, null, "");
 
   // resets the modal to its defaults
-  clearModalMatrices(currentMatrix);
+  clearModalMatrices(numbers);
 
   // sets up the visibility of the matrices inside the modal
   const params = operation.getParams();
@@ -171,9 +217,7 @@ export default function openMatrixModal(operation, currentMatrix) {
 
   // effectively shows the modal
   modalMatrixEl.style.display = "block";
-  setTimeout(() => {
-    modalMatrixEl.classList.add("in");
-  }, 10);
+  await openModalEffect(operation, currentMatrix);
 
   // utility functions used inside the modal
   function input(line) {
@@ -190,7 +234,7 @@ export default function openMatrixModal(operation, currentMatrix) {
   // a promise that is resolved when the modal is closed either by "okaying"
   // or dismissing it (reject)
   return new Promise((resolve, reject) => {
-    let matrix = currentMatrix;
+    let matrix = numbers;
 
     const modalOkEl = modalMatrixEl.querySelector("#matrix-ok");
     const modalCloseEls = [
@@ -209,6 +253,8 @@ export default function openMatrixModal(operation, currentMatrix) {
       );
 
       // triggers the closing animation
+      modalMatrixEl.classList.remove("totally-finished");
+      modalMatrixEl.classList.remove("finished");
       modalMatrixEl.classList.remove("in");
       setTimeout(() => {
         modalMatrixEl.style.display = "none";
