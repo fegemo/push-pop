@@ -118,7 +118,7 @@ new p5(p5 => {
     // preloads the sound effects
     sound.preload(
       ["hover.mp3", "pop.mp3", "push-end.mp3", "falling.mp3"].map(
-        n => `../sound/${n}`
+        n => `sound/${n}`
       )
     );
 
