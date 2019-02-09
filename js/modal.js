@@ -44,11 +44,15 @@ const keyPress = e => {
 };
 
 const popStater = closer => {
-  return e => {
+  const popStateCallback = e => {
     closer({
-      currentTarget: window
+      currentTarget: window,
+      type: "popstate"
     });
+    window.removeEventListener("popstate", popStateCallback);
   };
+
+  return popStateCallback;
 };
 
 const simulateTab = targetEl => {
@@ -246,7 +250,9 @@ export default async function openMatrixModal(operation, currentMatrix) {
       // removes the click handler, as it is
       e.currentTarget.removeEventListener("click", okHandler);
       document.body.removeEventListener("keydown", keyPress);
-      history.go(-1);
+      if (e.type !== "popstate") {
+        history.go(-1);
+      }
 
       modalCloseEls.forEach(el =>
         el.removeEventListener("click", closeHandler)
