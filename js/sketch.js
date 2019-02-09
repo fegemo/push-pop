@@ -105,17 +105,24 @@ new p5(p5 => {
     });
 
     const modalMatrixEl = document.querySelector("#modal-matrix");
+    // starts the dragging functionality that allows
+    // changing the matrix values on the modal
     dragger.bind(
       modalMatrixEl,
       ".matrix-value:not(:disabled), .parameter",
       0.1
     );
+    // starts the resizing of the parameters based on their content
     resizer.bind(modalMatrixEl, ".parameter");
+
+    // preloads the sound effects
     sound.preload(
       ["hover.mp3", "pop.mp3", "push-end.mp3", "falling.mp3"].map(
-        n => "../sound/" + n
+        n => `../sound/${n}`
       )
     );
+
+    // starts the translation to the current language
     bootstrapi18n("[data-t]");
   };
 
