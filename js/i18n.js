@@ -104,10 +104,16 @@ const replaceTranslatables = (selector, language) => {
     switch (el.tagName.toLowerCase()) {
       case "input":
         el.value = translate(el.dataset.t, language);
+        break;
       case "img":
         el.src = translate(el.dataset.t, language);
+        break;
+      case "meta":
+        el.content = translate(el.dataset.t, language);
+        break;
       default:
         el.innerHTML = translate(el.dataset.t, language);
+        break;
     }
   });
 };
